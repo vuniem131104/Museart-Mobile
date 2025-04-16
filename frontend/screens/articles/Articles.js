@@ -7,11 +7,11 @@ import axios from "axios";
 import MyFlatList from "../../components/MyFlatList";
 
 const Articles = () => {
-    const [isLoading, setLoading] = useState(false);
-    const [articles, setArticles] = useState([]);
+    const [ isLoading, setLoading ] = useState(false);
+    const [ articles, setArticles ] = useState([]);
     //pagination
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalpages] = useState(0);
+    const [ page, setPage ] = useState(1);
+    const [ totalPages, setTotalpages ] = useState(0);
 
     const getArticles = async () => {
         setLoading(true);
@@ -35,15 +35,37 @@ const Articles = () => {
     const loadMore = (p) => setPage(p);
 
     const renderPaginationButtons = () => {
-        const maxButtonsToShow = 5;
-        let startPage = Math.max(1, page - Math.floor(maxButtonsToShow / 2));
-        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
+        if (totalPages === 0) return null;
 
-        if (endPage - startPage + 1 < maxButtonsToShow) {
-            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
+        const maxButtonsToShow = 5;
+        let startPage = 1;
+        const half = Math.floor(maxButtonsToShow / 2);
+
+        if (totalPages > maxButtonsToShow) {
+            if (page <= half + 1) {
+                startPage = 1;
+            } else if (page >= totalPages - half) {
+                startPage = totalPages - maxButtonsToShow + 1;
+            } else {
+                startPage = page - half;
+            }
         }
 
+        const endPage = Math.min(startPage + maxButtonsToShow - 1, totalPages);
+
         const buttons = [];
+
+        // ← nút trái
+        buttons.push(
+            <TouchableOpacity
+                key="prev"
+                onPress={() => loadMore(page - 1)}
+                style={styles.arrowButton}
+                disabled={page === 1}
+            >
+                <Text style={styles.arrowText}>{'←'}</Text>
+            </TouchableOpacity>
+        );
 
         for (let i = startPage; i <= endPage; i++) {
             buttons.push(
@@ -51,20 +73,44 @@ const Articles = () => {
                     key={i}
                     onPress={() => loadMore(i)}
                     style={[
-                        styles.paginationButton,
-                        i === page ? styles.activeButton : null,
-                    ]}>
-                    <Text style={{ color: 'white' }}>{i}</Text>
-                </TouchableOpacity>,
+                        styles.pageButton,
+                        i === page && styles.activePageButton,
+                    ]}
+                >
+                    <Text
+                        style={[
+                            styles.pageButtonText,
+                            i === page && styles.activePageButtonText,
+                        ]}
+                    >
+                        {i}
+                    </Text>
+                </TouchableOpacity>
             );
         }
 
-        return buttons;
+        // → nút phải
+        buttons.push(
+            <TouchableOpacity
+                key="next"
+                onPress={() => loadMore(page + 1)}
+                style={styles.arrowButton}
+                disabled={page === totalPages}
+            >
+                <Text style={styles.arrowText}>{'→'}</Text>
+            </TouchableOpacity>
+        );
+
+        return (
+            <View style={styles.paginationContainer}>
+                {buttons}
+            </View>
+        );
     };
 
     useEffect(() => {
         getArticles();
-    }, [page]);
+    }, [ page ]);
 
     const renderItem = ({ item }) => {
         return (
@@ -85,7 +131,9 @@ const Articles = () => {
                 <Dashboard namePage={"Articles"}>
                     <MyFlatList data={articles} renderItem={renderItem}
                         isLoading={isLoading} handleLoading={handleLoading}
-                        renderPaginationButtons={renderPaginationButtons} />
+                        renderPaginationButtons={renderPaginationButtons} 
+                        paddingBottom={420}    
+                        />
                 </Dashboard>
             )
             }
@@ -96,19 +144,50 @@ const Articles = () => {
 export default Articles;
 
 const styles = StyleSheet.create({
-    paginationButton: {
+    container: {
+        flex: 1,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    paginationContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 15,
+        paddingBottom: 25,
+        marginBottom: 50,
+    },
+    pageButton: {
         justifyContent: 'center',
         alignItems: 'center',
         width: 40,
         height: 40,
         borderRadius: 20,
-        marginHorizontal: 4,
-        backgroundColor: 'gray',
+        backgroundColor: '#808080',
+        marginHorizontal: 5,
     },
-    activeButton: {
+    activePageButton: {
         backgroundColor: '#22c55d',
-        width: 50,
-        height: 50,
-        borderRadius: 25,
+    },
+    pageButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    activePageButtonText: {
+        fontWeight: 'bold',
+    },
+    arrowButton: {
+        paddingHorizontal: 5,
+        paddingBottom: 5,
+        backgroundColor: '#d1d5db',
+        borderRadius: 20,
+    },
+    arrowText: {
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });

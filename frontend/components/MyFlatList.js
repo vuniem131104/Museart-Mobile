@@ -2,7 +2,7 @@ import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } fr
 import React from 'react'
 
 const MyFlatList = ({ data, renderItem, isLoading,
-    handleLoading, renderPaginationButtons }) => {
+    handleLoading, renderPaginationButtons, paddingBottom }) => {
     const handleEmpty = () => {
         return <Text> No Institution!</Text>;
     };
@@ -17,11 +17,12 @@ const MyFlatList = ({ data, renderItem, isLoading,
                 refreshControl={
                     <RefreshControl refreshing={isLoading} onRefresh={handleLoading} />
                 }
-                ListFooterComponent={
-                    <View style={styles.paginationContainer}>
+                ListFooterComponent={() => (
+                    <View style={{ paddingBottom: 80 }}>
                         {renderPaginationButtons()}
                     </View>
-                }
+                )}
+                contentContainerStyle={{ paddingBottom: paddingBottom }}
             />
         </>
     );

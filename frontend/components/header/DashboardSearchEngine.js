@@ -11,14 +11,14 @@ const DashboardSearchEngine = () => {
   const onFrame41Press = () => { console.log("press frame-41") }
   const onFrame40Press = () => { console.log("press frame-40") }
   const { colors } = useTheme();
-  const [isLoading, setLoading] = useState(false);
-  const [data, setData] = useState([]);
+  const [ isLoading, setLoading ] = useState(false);
+  const [ data, setData ] = useState([]);
   //pagination
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalpages] = useState(0);
+  const [ page, setPage ] = useState(1);
+  const [ totalPages, setTotalpages ] = useState(0);
   const route = useRoute();
   const navigation = useNavigation();
-  const [filter, setFilter] = useState(null);
+  const [ filter, setFilter ] = useState(null);
 
   let model;
   switch (route.name) {
@@ -62,12 +62,12 @@ const DashboardSearchEngine = () => {
   const renderItem = ({ item }) => {
     return (
       <TouchableOpacity onPress={() => { handlePress(item.id) }}>
-        <Text numberOfLines={1} style={{ color: colors.onSurface }}>{item.title}</Text>
+        <Text numberOfLines={1} style={{ color: colors.onSurface, fontFamily: "PlayfairDisplay-Regular" }}>{item.title}</Text>
       </TouchableOpacity>
     );
   }
 
-  React.useEffect(() => { searchData(filter); console.log(page) }, [page])
+  React.useEffect(() => { searchData(filter); console.log(page) }, [ page ])
   return (
     <View style={{
       alignSelf: "stretch",
@@ -75,7 +75,7 @@ const DashboardSearchEngine = () => {
       justifyContent: "center",
       flexDirection: "column",
     }}>
-      <View style={[styles.dashboardsearchengine, { backgroundColor: colors.surfaceContainerHighest }]}>
+      <View style={[ styles.dashboardsearchengine, { backgroundColor: colors.surfaceContainerHighest } ]}>
         <Image
           style={styles.vectorIcon}
           contentFit="cover"
@@ -83,7 +83,7 @@ const DashboardSearchEngine = () => {
         />
         <TextInput placeholder="Search picture, product, . . ."
           placeholderTextColor={colors.onSurfaceVarient}
-          style={[styles.searchPictureProduct, { color: colors.onSurface }]}
+          style={[ styles.searchPictureProduct, { color: colors.onSurface } ]}
           onChangeText={(text) => {
             setFilter(text);
             if (text != '') searchData(text);
@@ -107,19 +107,48 @@ const DashboardSearchEngine = () => {
       </View>
       {
         data.length && filter != '' ?
-          <FlatList data={data} renderItem={renderItem}
+          <FlatList
+            data={data}
+            renderItem={renderItem}
             keyExtractor={item => item.id}
-            ListFooterComponent={<TouchableOpacity onPress={() => { loadMore() }}><Text style={{ color: colors.onSurfaceVarient }}>Load more {">"}</Text></TouchableOpacity>}
+            ItemSeparatorComponent={() => (
+              <View style={{ height: 1, backgroundColor: '#ccc', marginVertical: 5 }} />
+            )}
+            ListFooterComponent={
+              <TouchableOpacity
+                onPress={loadMore}
+                style={{
+                  padding: 12,
+                  marginTop: 10,
+                  backgroundColor: colors.surfaceContainer,
+                  borderRadius: 10,
+                  alignSelf: 'center',
+                }}>
+                <Text style={{ color: colors.onSurfaceVarient, fontFamily: "PlayfairDisplay-Bold" }}>
+                  Load more {'>'}
+                </Text>
+              </TouchableOpacity>
+            }
             ListEmptyComponent={handleEmpty}
+            contentContainerStyle={{
+              paddingVertical: 10,
+            }}
             style={{
-              position: "absolute", top: 60, backgroundColor: colors.surfaceContainerHighest,
-              zIndex: 10, // works on ios
-              elevation: 10,// works on android 
-              borderRadius: 15,
-              alignSelf: "center",
+              position: 'absolute',
+              top: 60,
+              backgroundColor: colors.surfaceContainerHighest,
+              zIndex: 10,
+              elevation: 10,
+              borderRadius: 20,
+              alignSelf: 'center',
+              width: Dimensions.get("screen").width - 20,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.1,
+              shadowRadius: 6,
               padding: 10,
-              width: Dimensions.get("screen").width - 20
-            }} />
+            }}
+          />
           : null
       }
     </View>
