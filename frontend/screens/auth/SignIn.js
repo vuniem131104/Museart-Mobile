@@ -17,15 +17,26 @@ import { FontFamily } from "../../GlobalStyles"; // Import FontFamily
 
 const SignIn = () => {
     const navigation = useNavigation();
-    const { signin, userInfo } = useContext(AuthContext);
-    const [email, setEmail] = useState(null);
-    const [password, setPassword] = useState(null);
+    const { signin, userInfo, isLoading, enableGuestMode } = useContext(AuthContext);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
-    useEffect(() => {
-        if (!navigation.canGoBack() && userInfo != null) {
-            navigation.navigate("Home");
+    const handleSignIn = () => {
+        if (!email || !password) {
+            alert('Please enter email and password');
+            return;
         }
-    }, [navigation, userInfo]);
+        signin(email, password);
+    };
+
+    const handleGuestAccess = () => {
+        console.log("SignIn: Guest button pressed");
+        if (enableGuestMode) {
+            enableGuestMode();
+        } else {
+            console.error("enableGuestMode function not available in AuthContext");
+        }
+    };
 
     return (
         <LinearGradient colors={['#BE0303', '#1c1a1a', '#000000']} style={styles.container}>
@@ -51,6 +62,8 @@ const SignIn = () => {
                             onChangeText={setEmail}
                             placeholderTextColor="#ccc"
                             style={styles.input}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
                         />
                     </View>
 
@@ -66,11 +79,17 @@ const SignIn = () => {
                         />
                     </View>
 
-                    <Pressable onPress={() => signin(email, password)} style={styles.signInButton}>
-                        <Text style={styles.signInText}>Sign in</Text>
+                    <Pressable 
+                        onPress={handleSignIn} 
+                        style={[styles.signInButton, isLoading && styles.disabledButton]}
+                        disabled={isLoading}
+                    >
+                        <Text style={styles.signInText}>
+                            {isLoading ? 'Signing in...' : 'Sign in'}
+                        </Text>
                     </Pressable>
 
-                    <Pressable onPress={() => navigation.navigate("Home")} style={styles.guestButton}>
+                    <Pressable onPress={handleGuestAccess} style={styles.guestButton}>
                         <Text style={styles.guestText}>Guest</Text>
                     </Pressable>
 
@@ -146,6 +165,10 @@ const styles = StyleSheet.create({
         padding: 14,
         borderRadius: 12,
         alignItems: "center",
+    },
+    disabledButton: {
+        backgroundColor: "#882222",
+        opacity: 0.7,
     },
     signInText: {
         color: "white",

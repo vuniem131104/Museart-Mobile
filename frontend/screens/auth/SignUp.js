@@ -9,6 +9,7 @@ import {
     Pressable,
     TextInput,
     SafeAreaView,
+    Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,16 +17,38 @@ import { AuthContext } from "../../context/authContext";
 
 const SignUp = () => {
     const navigation = useNavigation();
-    const { signup, userInfo } = useContext(AuthContext);
-    const [username, setUsername] = useState(null);
-    const [email, setEmail] = useState(null);
-    const [password, setPassword] = useState(null);
+    const { signup, userInfo, isLoading } = useContext(AuthContext);
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     useEffect(() => {
-        if (!navigation.canGoBack() && userInfo != null) {
-            navigation.navigate("Home");
+        if (userInfo != null) {
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Home' }],
+            });
         }
     }, [navigation, userInfo]);
+
+    const handleSignUp = () => {
+        if (!username || !email || !password) {
+            Alert.alert('Error', 'Please fill in all fields');
+            return;
+        }
+        
+        if (password.length < 6) {
+            Alert.alert('Error', 'Password must be at least 6 characters');
+            return;
+        }
+        
+        if (!email.includes('@')) {
+            Alert.alert('Error', 'Please enter a valid email address');
+            return;
+        }
+        
+        signup(username, email, password, 'user');
+    };
 
     return (
         <LinearGradient colors={['#BE0303', '#1c1a1a', '#000000']} style={styles.container}>
@@ -62,6 +85,8 @@ const SignUp = () => {
                             onChangeText={setEmail}
                             placeholderTextColor="#ccc"
                             style={styles.input}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
                         />
                     </View>
 
@@ -77,8 +102,14 @@ const SignUp = () => {
                         />
                     </View>
 
-                    <Pressable onPress={() => signup(username, email, password, 'user')} style={styles.signUpButton}>
-                        <Text style={styles.signUpText}>Sign Up</Text>
+                    <Pressable 
+                        onPress={handleSignUp} 
+                        style={[styles.signUpButton, isLoading && styles.disabledButton]}
+                        disabled={isLoading}
+                    >
+                        <Text style={styles.signUpText}>
+                            {isLoading ? 'Creating Account...' : 'Sign Up'}
+                        </Text>
                     </Pressable>
 
                     <View style={styles.footer}>
@@ -115,6 +146,7 @@ const styles = StyleSheet.create({
         color: "#fff",
         marginTop: 12,
         fontWeight: "bold",
+        fontFamily: "PlayfairDisplay-Bold",
     },
     content: {
         gap: 20,
@@ -152,6 +184,10 @@ const styles = StyleSheet.create({
         padding: 14,
         borderRadius: 12,
         alignItems: "center",
+    },
+    disabledButton: {
+        backgroundColor: "#882222",
+        opacity: 0.7,
     },
     signUpText: {
         color: "white",
