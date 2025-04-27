@@ -40,7 +40,12 @@
         "backgroundColor": "#D00000"
       },
       "package": "com.yourcompany.museart",
-      "jsEngine": "hermes"
+      "jsEngine": "hermes",
+      "permissions": [
+        "READ_MEDIA_IMAGES",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

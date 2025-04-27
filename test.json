@@ -1,0 +1,152 @@
+[
+    {
+        "_score": 1039.6661,
+        "api_link": "https://api.artic.edu/api/v1/artworks/94235",
+        "api_model": "artworks",
+        "id": 94235,
+        "is_boosted": false,
+        "thumbnail": {
+            "alt_text": "Seven square panels of gray patterned lines on cream paper, wach with five rows and seven columns of neat marks.",
+            "height": 11434,
+            "lqip": "data:image/gif;base64,R0lGODlhCgAFAPUAANHNwtHOxNPQxNXSx9fTx9fUx9nUx9fTyNbTytnVyNjUydvYzdvYztvZz9/ZzdzZz97az9/bz9/cz93Z0N/c0uDazeDbzeDd0eHd0uDe0+Pf0+Tf0+Pf1OTf1OTg0+Xh0+fh0ufi0+Pg1ePg1uXg1eXh1ebh1ebj1+fl1+jm2evm2enk2urm2uzn2evp4/n5+Pz8/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAKAAUAAAYuQAqG4VA8NI1LZqUigSqllgiVQhwCBIDAMEgURiYO67QJeT6RiWTRiUAsLtgrCAA7",
+            "width": 22573
+        },
+        "timestamp": "2025-04-17T22:26:56-05:00",
+        "title": "Seven Panels and Index"
+    },
+    {
+        "_score": 1029.5765,
+        "api_link": "https://api.artic.edu/api/v1/artworks/228882",
+        "api_model": "artworks",
+        "id": 228882,
+        "is_boosted": false,
+        "thumbnail": {
+            "alt_text": "Mixed-media work incorporating found objects that depicts five light- and dark-skinned musicians playing musical instruments.",
+            "height": 1974,
+            "lqip": "data:image/gif;base64,R0lGODlhBgAFAPQAAB4QCC4cETAeFS4oJToqJFoxFmo5Gkg1JUk6LVw+L0w+Mk5ANF9ENFREPWBFMkxIR1dIQF9LQlFNTGpSRGBRTGVaTnJaTGRhX3NmWXZmXX1tZnduaopZOoJ8egAAAAAAACH5BAAAAAAALAAAAAAGAAUAAAUYYAdZ0aRdRsM41MYRySBlhRAAD3YsClKFADs=",
+            "width": 2250
+        },
+        "timestamp": "2025-04-18T00:30:24-05:00",
+        "title": "The Jazz Wall"
+    },
+    {
+        "_score": 936.7585,
+        "api_link": "https://api.artic.edu/api/v1/artworks/116290",
+        "api_model": "artworks",
+        "id": 116290,
+        "is_boosted": false,
+        "thumbnail": {
+            "alt_text": "A work made of steel and paint.",
+            "height": 3012,
+            "lqip": "data:image/gif;base64,R0lGODlhAgAFAPMAAFNRUFdVVGtqaWxqaKCfna+urbq5ub69vsHAvtXU1AAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAACAAUAAAQI0JwhAigkoQgAOw==",
+            "width": 1320
+        },
+        "timestamp": "2025-04-17T22:31:16-05:00",
+        "title": "Three-Quarter Composite Armor for the Infantry"
+    },
+    {
+        "_score": 911.1997,
+        "api_link": "https://api.artic.edu/api/v1/artworks/116228",
+        "api_model": "artworks",
+        "id": 116228,
+        "is_boosted": false,
+        "thumbnail": {
+            "alt_text": "A work made of steel.",
+            "height": 1266,
+            "lqip": "data:image/gif;base64,R0lGODlhAwAFAPMAAEE8OkpFQVBLR1tWUVxXUmVhWW9rYXBrYnNuZXp1bnt2bnx3b4F9dAAAAAAAAAAAACH5BAAAAAAALAAAAAADAAUAAAQKsLAgB1LkLGESiAA7",
+            "width": 666
+        },
+        "timestamp": "2025-04-17T22:31:15-05:00",
+        "title": "Waistcoat Cuirass"
+    },
+    {
+        "_score": 865.83936,
+        "api_link": "https://api.artic.edu/api/v1/artworks/229496",
+        "api_model": "artworks",
+        "id": 229496,
+        "is_boosted": false,
+        "thumbnail": {
+            "alt_text": "A work made of four found oil paintings on canvas-covered board, photographic copies, magazine pages, and tracing paper, with collaged text and images.",
+            "height": 1500,
+            "lqip": "data:image/gif;base64,R0lGODlhCAAFAPUAAIx7Z6iPcLqok86uh8KqjsqtitO1kdi4kcnDvNLFt9DHv97PutzOv9/QuczKwtHKw9XNw9DLxtHNxtTRxdzRxtPSytfRy9fXz9rTzNnUzdjVzt7VzdnZydzY0N3c1N/d1uDSweLUw+Pe2OLf2OTh3OTj3Onm3+rm4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAIAAUAAAYlQEfl4tFIIohJ51MiZTAKzkhkOm0oCUZo0QBBLI8AYHAwFAiCIAA7",
+            "width": 2250
+        },
+        "timestamp": "2025-04-17T22:46:20-05:00",
+        "title": "Wu Street"
+    },
+    {
+        "_score": 859.41296,
+        "api_link": "https://api.artic.edu/api/v1/artworks/204584",
+        "api_model": "artworks",
+        "id": 204584,
+        "is_boosted": false,
+        "thumbnail": {
+            "alt_text": "A work made of album leaf; ink and color on paper.",
+            "height": 2250,
+            "lqip": "data:image/gif;base64,R0lGODlhBgAFAPQAAJ+VfqGWf6KZgqSYgKWagqSag6iehq6gh6+iiLGljLGnj7WqkLOsk7OrlLWslLiwl7mxmLqymbqzm8W8n8O6oMnApcvCpsrCp83Dp8vDqMzDqMvEqs/HrdLLsQAAAAAAACH5BAAAAAAALAAAAAAGAAUAAAUY4KRZGCVlG9cxEVQkDbA8DhIMxlUpByGEADs=",
+            "width": 2887
+        },
+        "timestamp": "2025-04-17T22:43:11-05:00",
+        "title": "Landscape in the Style of Ancient Masters: after Wang Meng (c. 1308-1385)"
+    },
+    {
+        "_score": 730.876,
+        "api_link": "https://api.artic.edu/api/v1/artworks/182728",
+        "api_model": "artworks",
+        "id": 182728,
+        "is_boosted": true,
+        "thumbnail": {
+            "alt_text": "Six various sized ceramic vessels painted deep red, cream, and black.",
+            "height": 2704,
+            "lqip": "data:image/gif;base64,R0lGODlhCAAFAPUAAFMfJGUzL2UzNGc/PXJDPHo+Q2hHQnRDQHNSTnFoYXZkbHxocItWUJR+bpp5a4pxcYF6cpiAcZ+FdqSHdqmHd5h+g4iJhZmNg5aRjaCMgqCWibKii7uoi7Wol7GqmqKfp8Synd/Kqq+8yLXDzbnJ1MLW3czd59Lf6AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAIAAUAAAYlQIjBUvmYRqWEAFRYkEQnxCAUACg8GwaB4zg8OprIpCGhZC6YIAA7",
+            "width": 4064
+        },
+        "timestamp": "2025-04-17T22:40:22-05:00",
+        "title": "Urns (Set of 8)"
+    },
+    {
+        "_score": 580.06067,
+        "api_link": "https://api.artic.edu/api/v1/artworks/242768",
+        "api_model": "artworks",
+        "id": 242768,
+        "is_boosted": false,
+        "thumbnail": {
+            "alt_text": "A work made of chromogenic prints (8).",
+            "height": 5147,
+            "lqip": "data:image/gif;base64,R0lGODlhCgAFAPUAAHJycnl6eoKDg4eFgomHhImHhYiIiIqKioyKiIyLiY6Mio+Pj5GQjpWWlp2cmamekqqek6qfk6melKuglKyglq+jlrClmrKmmrSonbe0sbe2sru5tLm4tsrHwcvJxc3Kxc3KxtDNydLPytLQzdPRzdXT0NXU0NbU0dfW1NjW0djX1NnY1drZ197d2uPi4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAKAAUAAAYuQM8IxXK1VCtVSQMQGBqLwOHA2RAGBUSC4VBkOqIQKEQynVKfSQTykFAsmEslCAA7",
+            "width": 9829
+        },
+        "timestamp": "2025-04-17T22:48:10-05:00",
+        "title": "Physiognomies (Physiognomien)"
+    },
+    {
+        "_score": 525.53046,
+        "api_link": "https://api.artic.edu/api/v1/artworks/131541",
+        "api_model": "artworks",
+        "id": 131541,
+        "is_boosted": true,
+        "thumbnail": {
+            "alt_text": "A finely detailed drawing of architectural ornament in an organic style made up of whiplash appendages and spiral stalks.",
+            "height": 0,
+            "lqip": "data:image/gif;base64,R0lGODlhBgAFAPQAANTHtNfJttfJt9rLt9zNuOHSvOTVv+bWwOnaxOjaxerbxuvbx+vcxuzcx+3cx+vcyOvdyuvdy+zdye7eye3eyuzey+7fy+3fzOzeze3fzezfzu3fzgAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAGAAUAAAUWYMUgSBRtTiFU1VYJQIsOhLNFiHGUIQA7",
+            "width": 0
+        },
+        "timestamp": "2025-04-17T22:34:25-05:00",
+        "title": "System of Architectural Ornament, Plate 16, Impromptu!"
+    },
+    {
+        "_score": 518.2647,
+        "api_link": "https://api.artic.edu/api/v1/artworks/36536",
+        "api_model": "artworks",
+        "id": 36536,
+        "is_boosted": false,
+        "thumbnail": {
+            "alt_text": "A circular decoration with a central cross and radiating organic motifs composed of natural and geometric forms.",
+            "height": 5044,
+            "lqip": "data:image/gif;base64,R0lGODlhBQAFAPQAAGlXSW1cTnJeT3BeUIBzaIJ2bIt6bY+EepOFe5+ZkqSfm6qkn7SwrMnIxsrLy83My9DPzc/Qz9PS0dLS0tXV1dbW1dXW1tnY19rZ2QAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAFAAUAAAUVYPQkkNUQQyEpgBEs1CEgl1Mx2BQCADs=",
+            "width": 5026
+        },
+        "timestamp": "2025-04-17T22:16:59-05:00",
+        "title": "Elevator Grille Ornament from Schlesinger and Mayer Store, Chicago, Illinois"
+    }
+]

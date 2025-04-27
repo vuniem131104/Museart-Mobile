@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Dashboard from "../../components/header/Dashboard";
 import FrameComponent from "../../components/FrameComponent";
 import axios from "axios";
@@ -10,10 +10,24 @@ import MyFlatList from "../../components/MyFlatList";
 
 const Artworks = () => {
     const navigation = useNavigation();
+    const route = useRoute();
     const [isLoading, setLoading] = useState(false);
     const [artworks, setArtworks] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+
+    // Check if we have image search results
+    const imageSearchResults = route.params?.searchResults;
+    const isImageSearch = route.params?.isImageSearch;
+
+    useEffect(() => {
+        if (isImageSearch && imageSearchResults) {
+            setArtworks(imageSearchResults);
+            setTotalPages(1); 
+        } else {
+            getArtworks();
+        }
+    }, [page, isImageSearch, imageSearchResults]);
 
     const getArtworks = async () => {
         setLoading(true);
@@ -30,13 +44,14 @@ const Artworks = () => {
 
     const renderItem = ({ item }) => {
         return (
-            <FrameComponent key={item.id}
+            <FrameComponent
+                key={item.id}
                 onFramePressablePress={() => {
                     navigation.navigate('ArtworkDetail', { ID: item.id })
                 }}
                 frameImage={`https://www.artic.edu/iiif/2/${item.image_id}/full/843,/0/default.jpg`}
                 title={item.title}
-                text={item.thumbnail?.alt_text}
+                text={isImageSearch ? item.alt_text : item.thumbnail?.alt_text}
             />
         );
     };
@@ -47,13 +62,13 @@ const Artworks = () => {
     };
 
     const loadMore = (p) => {
-        if (p >= 1 && p <= totalPages) {
+        if (!isImageSearch && p >= 1 && p <= totalPages) {
             setPage(p);
         }
     };
 
     const renderPaginationButtons = () => {
-        if (totalPages === 0) return null;
+        if (isImageSearch || totalPages === 0) return null;
 
         const maxButtonsToShow = 5;
         let startPage = 1;
@@ -125,10 +140,6 @@ const Artworks = () => {
             </View>
         );
     };
-
-    useEffect(() => {
-        getArtworks();
-    }, [page]);
 
     return (
         <View style={styles.container}>

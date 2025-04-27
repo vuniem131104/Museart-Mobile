@@ -1,24 +1,24 @@
 import * as React from "react";
 import { useState } from "react";
-import { StyleSheet, View, Image, TextInput, Pressable, FlatList, Text, Touchable, TouchableOpacity, Dimensions } from "react-native";
+import { StyleSheet, View, Image, TextInput, Pressable, FlatList, Text, Touchable, TouchableOpacity, Dimensions, ActivityIndicator } from "react-native";
 import { FontSize, FontFamily, Border } from "../../GlobalStyles";
 import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
 import axios from "axios";
 import { baseUrl } from "../../services/api";
+import * as ImagePicker from 'expo-image-picker';
+
 
 const DashboardSearchEngine = () => {
-
-  const onFrame41Press = () => { console.log("press frame-41") }
-  const onFrame40Press = () => { console.log("press frame-40") }
-  const { colors } = useTheme();
+  const API_URL = 'http://192.168.39.105:8000'
   const [ isLoading, setLoading ] = useState(false);
   const [ data, setData ] = useState([]);
-  //pagination
   const [ page, setPage ] = useState(1);
   const [ totalPages, setTotalpages ] = useState(0);
+  const [ isUploading, setIsUploading ] = useState(false);
   const route = useRoute();
   const navigation = useNavigation();
   const [ filter, setFilter ] = useState(null);
+  const { colors } = useTheme();
 
   let model;
   switch (route.name) {
@@ -65,7 +65,62 @@ const DashboardSearchEngine = () => {
         <Text numberOfLines={1} style={{ color: colors.onSurface, fontFamily: "PlayfairDisplay-Regular" }}>{item.title}</Text>
       </TouchableOpacity>
     );
-  }
+  };
+
+
+  const onFrame41Press = async () => {
+    try {
+      // Request permission to access the camera roll
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Sorry, we need camera roll permissions to make this work!');
+        return;
+      }
+
+      // Launch image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setIsUploading(true);
+        // Create form data
+        const formData = new FormData();
+        formData.append('file', {
+          uri: result.assets[0].uri,
+          type: 'image/jpeg',
+          name: 'image.jpg'
+        });
+
+        // Send POST request to backend
+        const response = await axios.post(`${API_URL}/image_search`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        
+        if (response.data) {
+          // Navigate to Artwork screen with the search results
+          navigation.navigate('ArtworkScreen', {
+            searchResults: response.data.answer,
+            isImageSearch: true
+          });
+        } else {
+          throw new Error(response.data?.error || 'Unknown error occurred');
+        }
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert(`Error uploading image: ${error.message}`);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const onFrame40Press = () => { console.log("press frame-40") }
 
   React.useEffect(() => { searchData(filter); console.log(page) }, [ page ])
   return (
@@ -90,12 +145,16 @@ const DashboardSearchEngine = () => {
             else setPage(1);
           }}
         />
-        <Pressable onPress={onFrame41Press}>
-          <Image
-            style={styles.dashboardsearchengineChild}
-            contentFit="cover"
-            source={require("../../assets/frame-41.png")}
-          />
+        <Pressable onPress={onFrame41Press} disabled={isUploading}>
+          {isUploading ? (
+            <ActivityIndicator size="small" color={colors.onSurface} />
+          ) : (
+            <Image
+              style={styles.dashboardsearchengineChild}
+              contentFit="cover"
+              source={require("../../assets/frame-41.png")}
+            />
+          )}
         </Pressable>
         <Pressable onPress={onFrame40Press}>
           <Image
@@ -105,8 +164,7 @@ const DashboardSearchEngine = () => {
           />
         </Pressable>
       </View>
-      {
-        data.length && filter != '' ?
+      {data.length > 0 && filter !== '' ? (
           <FlatList
             data={data}
             renderItem={renderItem}
@@ -130,9 +188,7 @@ const DashboardSearchEngine = () => {
               </TouchableOpacity>
             }
             ListEmptyComponent={handleEmpty}
-            contentContainerStyle={{
-              paddingVertical: 10,
-            }}
+            contentContainerStyle={{ paddingVertical: 10 }}
             style={{
               position: 'absolute',
               top: 60,
@@ -146,11 +202,11 @@ const DashboardSearchEngine = () => {
               shadowOffset: { width: 0, height: 3 },
               shadowOpacity: 0.1,
               shadowRadius: 6,
-              padding: 10,
-            }}
-          />
-          : null
-      }
+            padding: 10,
+          }}
+        />
+      ) : null}
+
     </View>
   );
 };

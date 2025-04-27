@@ -9,12 +9,15 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain.chains import create_retrieval_chain, create_history_aware_retriever
 from langchain_chroma import Chroma
 import os 
+import shutil
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, UploadFile, File
 from fastapi.responses import JSONResponse
 import uvicorn
-
+# from image_retrieval import ImageRetriever
 load_dotenv()
+
+# image_retriever = ImageRetriever()
 
 app = FastAPI()
 
@@ -102,6 +105,46 @@ async def chat(request: Request):
         "configurable": {"session_id": "default"}
     })
     return JSONResponse(content={"answer": answer["answer"]})
+
+@app.post("/image_search")
+async def image_search(file: UploadFile = File(...)):
+    # temp_image_path = f"temp_{file.filename}"
+    # with open(temp_image_path, "wb") as buffer:
+    #     shutil.copyfileobj(file.file, buffer)
+
+    # Here you would process the image with your image retriever
+    # For now, we'll return test data in the correct format
+    answer = [
+        {   
+            "id": 24202,
+            "image_id": "e127aa5e-2154-5116-76e1-0c3f0c4a7cb4",
+            "title": "The Great Wave off Kanagawa",
+            "alt_text": "A beautiful image of a cat"
+        },
+        {   
+            "id": 24202,
+            "image_id": "e127aa5e-2154-5116-76e1-0c3f0c4a7cb4",
+            "title": "The Great Wave off Kanagawa",
+            "alt_text": "A beautiful image of a cat"
+        },
+        {   
+            "id": 24202,
+            "image_id": "e127aa5e-2154-5116-76e1-0c3f0c4a7cb4",
+            "title": "The Great Wave off Kanagawa",
+            "alt_text": "A beautiful image of a cat"
+        }
+    ]
+
+    # os.remove(temp_image_path)
+
+    # result = []
+    # for item in answer:
+    #     result.append({
+    #         "title": item["metadata"]["title"],
+    #         "url": item["url"],
+    #         "text": item["metadata"]["text"]
+    #     })
+    return JSONResponse(content={"answer": answer})
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8000, host="0.0.0.0", reload=True)
