@@ -1,1 +1,42 @@
 node_modules
+
+# Node modules
+/node_modules/
+# Dependencies for React Native
+**/node_modules/
+# Expo build files
+.expo/
+.expo-shared/
+# React Native packager cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+# Android/ios build files
+/android/
+/ios/
+/build/
+# Logs
+*.log
+*.log.*
+# OS generated files
+.DS_Store
+Thumbs.db
+# React Native Pods
+ios/Pods/
+/ios/Podfile.lock
+# Environment files
+.env
+# VS Code settings
+.vscode/
+# JetBrains project files
+.idea/
+# Next.js (if used)
+.next/
+# MacOS Finder folder settings
+.AppleDouble
+.LSOverride
+# Windows installer logs
+*.cab
+*.msi
+*.msm
+*.msp

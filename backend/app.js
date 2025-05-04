@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { sequelize } = require("./models/models");
+const sequelize = require("./models/config.models");
 
 // Import routes
 const authRoutes = require("./routes/auth.routes");
@@ -36,7 +36,7 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
   console.log(`Server đang chạy trên cổng ${PORT}.`);
-  
+
   try {
     // Kiểm tra kết nối database
     await sequelize.authenticate();
@@ -46,4 +46,4 @@ app.listen(PORT, async () => {
   }
 });
 
-module.exports = app; 
+module.exports = app;
