@@ -63,8 +63,8 @@ const SignUp = () => {
                 </SafeAreaView>
 
                 <View style={styles.content}>
-                    <Text style={styles.title}>Let's start with Museart!</Text>
-                    <Text style={styles.subText}>Create a new account to explore Museart</Text>
+                    <Text style={styles.title}>Let's start!</Text>
+                    <Text style={styles.subText}>Create a new account</Text>
 
                     <View style={styles.inputWrapper}>
                         <Image style={styles.icon} source={require("../../assets/group-191.png")} />
@@ -146,22 +146,20 @@ const styles = StyleSheet.create({
         color: "#fff",
         marginTop: 12,
         fontWeight: "bold",
-        fontFamily: "Inter-Bold",
+        fontFamily: "PlayfairDisplay-Bold",
     },
     content: {
         gap: 20,
     },
     title: {
         fontSize: 22,
-        fontFamily: "Inter-Bold",
+        fontFamily: "PlayfairDisplay-Bold",
         color: "#fff",
-        textAlign: "center",
     },
     subText: {
         fontSize: 16,
         color: "#eee",
-        fontFamily: "Inter-Regular",
-        textAlign: "center",
+        fontFamily: "PlayfairDisplay-Regular",
     },
     inputWrapper: {
         flexDirection: "row",
@@ -179,7 +177,7 @@ const styles = StyleSheet.create({
         color: "white",
         flex: 1,
         fontSize: 16,
-        fontFamily: "Inter-Regular",
+        fontFamily: "PlayfairDisplay-Regular",
     },
     signUpButton: {
         backgroundColor: "#BE0303",
@@ -193,7 +191,7 @@ const styles = StyleSheet.create({
     },
     signUpText: {
         color: "white",
-        fontFamily: "Inter-Bold",
+        fontFamily: "PlayfairDisplay-Bold",
     },
     footer: {
         flexDirection: "row",
@@ -202,11 +200,11 @@ const styles = StyleSheet.create({
     },
     footerText: {
         color: "#ccc",
-        fontFamily: "Inter-Regular",
+        fontFamily: "PlayfairDisplay-Regular",
     },
     signInText: {
         color: "#fff",
-        fontFamily: "Inter-Bold",
+        fontFamily: "PlayfairDisplay-Bold",
     },
 });
 

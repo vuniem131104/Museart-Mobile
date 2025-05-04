@@ -4,12 +4,12 @@ import { StyleSheet, Image, Pressable, Modal, SafeAreaView, View, StatusBar, Tou
 import { Border, Padding } from "../../GlobalStyles";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import SettingsMenu from "./SettingsMenu";
-import ChatbotModal from "../chatbot/ChatbotModal"; // Import the ChatbotModal component
+import ChatbotModal from "../chatbot/ChatbotModal"; 
 
 const NavbarTop = () => {
   const navigation = useNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isChatbotVisible, setChatbotVisible] = useState(false); // New state for chatbot modal
+  const [isChatbotVisible, setChatbotVisible] = useState(false); 
 
   const { colors } = useTheme();
 
@@ -18,19 +18,6 @@ const NavbarTop = () => {
     const prevRoute = routes[routes.length - 2];
     if (navigation.canGoBack() && (prevRoute != null)) navigation.goBack();
   };
-
-  const openMenu = () => {
-    setIsModalVisible(true);
-  };
-
-  const closeMenu = () => {
-    setIsModalVisible(false);
-  };
-
-  // Log when menu is opened or closed for debugging
-  React.useEffect(() => {
-    console.log('Menu visibility changed to:', isModalVisible);
-  }, [isModalVisible]);
 
   return (
     <SafeAreaView style={styles.navbartop}>
@@ -42,7 +29,7 @@ const NavbarTop = () => {
       </Pressable>
 
       <Pressable 
-        onPress={() => setChatbotVisible(true)} // Open chatbot when pressed
+        onPress={() => setChatbotVisible(true)} 
         style={[styles.iconContainer, { marginTop: -5}]}
       >
         <Image
@@ -53,7 +40,7 @@ const NavbarTop = () => {
       </Pressable>
       
       <Pressable 
-        onPress={openMenu} 
+        onPress={() => { setIsModalVisible(true) }} 
         style={[styles.iconContainer, { backgroundColor: colors.primary }]}
       >
         <Image
@@ -67,14 +54,14 @@ const NavbarTop = () => {
         visible={isModalVisible}
         transparent={true}
         animationType="fade"
-        onRequestClose={closeMenu}
+        onRequestClose={() => setIsModalVisible(false)}
         statusBarTranslucent={true}
       >
-        <TouchableWithoutFeedback onPress={closeMenu}>
+        <TouchableWithoutFeedback onPress={() => setIsModalVisible(false)}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={styles.menuContainer}>
-                <SettingsMenu closeMenu={closeMenu} />
+                <SettingsMenu/>
               </View>
             </TouchableWithoutFeedback>
           </View>

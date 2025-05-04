@@ -6,7 +6,8 @@ import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
 import axios from "axios";
 import { baseUrl } from "../../services/api";
 import * as ImagePicker from 'expo-image-picker';
-
+import { Audio } from 'expo-av';
+import * as FileSystem from 'expo-file-system';
 
 const DashboardSearchEngine = () => {
   const API_URL = 'http://192.168.39.105:8000'
@@ -120,7 +121,48 @@ const DashboardSearchEngine = () => {
     }
   };
 
-  const onFrame40Press = () => { console.log("press frame-40") }
+  const onFrame40Press = async () => {
+    try {
+      const { granted } = await Audio.requestPermissionsAsync();
+      if (!granted) {
+        alert("Microphone permission denied");
+        return;
+      }
+  
+      // Bắt đầu ghi âm
+      const recording = new Audio.Recording();
+      await recording.prepareToRecordAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
+      await recording.startAsync();
+  
+      console.log("Recording for 3 seconds...");
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      await recording.stopAndUnloadAsync();
+  
+      const uri = recording.getURI();
+      const fileInfo = await FileSystem.getInfoAsync(uri);
+  
+      const formData = new FormData();
+      formData.append('audio', {
+        uri,
+        name: 'recording.wav',
+        type: 'audio/wav'
+      });
+  
+      const response = await axios.post('http://192.168.1.11:8000/speech-to-text', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+  
+      const { text } = response.data;
+      console.log("Recognized text:", text);
+      setFilter(text);
+      searchData(text);
+    } catch (error) {
+      console.error('Recording error:', error);
+      alert("Recording or upload failed.");
+    }
+  };
 
   React.useEffect(() => { searchData(filter); console.log(page) }, [ page ])
   return (
@@ -139,6 +181,7 @@ const DashboardSearchEngine = () => {
         <TextInput placeholder="Search picture, product, . . ."
           placeholderTextColor={colors.onSurfaceVarient}
           style={[ styles.searchPictureProduct, { color: colors.onSurface } ]}
+          value={filter}
           onChangeText={(text) => {
             setFilter(text);
             if (text != '') searchData(text);

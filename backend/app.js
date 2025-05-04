@@ -9,13 +9,8 @@ const userRoutes = require("./routes/user.routes");
 // Khởi tạo Express app
 const app = express();
 
-// Thiết lập CORS with more options
-app.use(cors({
-  origin: '*', // Allow all origins for development
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'],
-  credentials: true
-}));
+// Thiết lập CORS
+app.use(cors());
 
 // Parse requests of content-type - application/json
 app.use(express.json());
@@ -39,17 +34,13 @@ app.use((req, res) => {
 
 // Thiết lập cổng và khởi động server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', async () => {
+app.listen(PORT, async () => {
   console.log(`Server đang chạy trên cổng ${PORT}.`);
   
   try {
     // Kiểm tra kết nối database
     await sequelize.authenticate();
     console.log("Kết nối database thành công.");
-    
-    // Đồng bộ hóa models với database
-    await sequelize.sync();
-    console.log("Đồng bộ hóa models thành công.");
   } catch (error) {
     console.error("Kết nối database thất bại:", error);
   }

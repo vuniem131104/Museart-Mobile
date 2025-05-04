@@ -14,21 +14,12 @@ import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { AuthContext } from "../../context/authContext";
 import { FontFamily } from "../../GlobalStyles"; // Import FontFamily
-import axios from 'axios';
-import { backendUrl, getConnectionInfo } from '../../services/api';
 
 const SignIn = () => {
     const navigation = useNavigation();
     const { signin, userInfo, isLoading, enableGuestMode } = useContext(AuthContext);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    // const [testingConnection, setTestingConnection] = useState(false);
-    // const [networkInfo, setNetworkInfo] = useState(null);
-
-    // useEffect(() => {
-    //     // Get connection info for troubleshooting
-    //     setNetworkInfo(getConnectionInfo());
-    // }, []);
 
     const handleSignIn = () => {
         if (!email || !password) {
@@ -46,23 +37,6 @@ const SignIn = () => {
             console.error("enableGuestMode function not available in AuthContext");
         }
     };
-    
-    // const testConnection = async () => {
-    //     setTestingConnection(true);
-    //     try {
-    //         console.log('Testing connection to:', `${backendUrl}/auth/test`);
-    //         const result = await axios.get(`${backendUrl}/auth/test`, { timeout: 5000 });
-    //         console.log('Connection test result:', result.data);
-    //         alert(`Connection successful: ${JSON.stringify(result.data)}`);
-    //     } catch (error) {
-    //         console.log('Connection test error:', error);
-    //         console.log('Connection test error message:', error.message);
-    //         console.log('Connection test error code:', error.code);
-    //         alert(`Connection failed: ${error.message}`);
-    //     } finally {
-    //         setTestingConnection(false);
-    //     }
-    // };
 
     return (
         <LinearGradient colors={['#BE0303', '#1c1a1a', '#000000']} style={styles.container}>
@@ -77,8 +51,8 @@ const SignIn = () => {
                 </SafeAreaView>
 
                 <View style={styles.content}>
-                    <Text style={styles.welcomeText}>Welcome to the online museum!</Text>
-                    <Text style={styles.subText}>Sign in to explore artworks around the world.</Text>
+                    <Text style={styles.welcomeText}>Welcome to online museum!</Text>
+                    <Text style={styles.subText}>Sign in to explore all artworks from around the world.</Text>
 
                     <View style={styles.inputWrapper}>
                         <Image style={styles.icon} source={require("../../assets/group-19.png")} />
@@ -118,16 +92,6 @@ const SignIn = () => {
                     <Pressable onPress={handleGuestAccess} style={styles.guestButton}>
                         <Text style={styles.guestText}>Guest</Text>
                     </Pressable>
-                    
-                    {/* <Pressable 
-                        onPress={testConnection} 
-                        style={[styles.testButton, testingConnection && styles.disabledButton]}
-                        disabled={testingConnection}
-                    >
-                        <Text style={styles.testText}>
-                            {testingConnection ? 'Testing...' : 'Test Connection'}
-                        </Text>
-                    </Pressable> */}
 
                     <View style={styles.footer}>
                         <Text style={styles.footerText}>Don't have account?</Text>
@@ -135,7 +99,6 @@ const SignIn = () => {
                             <Text style={styles.signUpText}> Sign up</Text>
                         </Pressable>
                     </View>
-                    
                 </View>
             </ScrollView>
         </LinearGradient>
@@ -164,7 +127,7 @@ const styles = StyleSheet.create({
         color: "#fff",
         marginTop: 12,
         fontWeight: "bold",
-        fontFamily: "Inter-Bold", // Thay đổi font
+        fontFamily: "PlayfairDisplay-Bold", // Thay đổi font
     },
     content: {
         gap: 20,
@@ -172,14 +135,12 @@ const styles = StyleSheet.create({
     welcomeText: {
         fontSize: 22,
         color: "#fff",
-        fontFamily: "Inter-Bold", // Thay đổi font
-        textAlign: "center",
+        fontFamily: "PlayfairDisplay-Bold", // Thay đổi font
     },
     subText: {
         fontSize: 16,
         color: "#eee",
-        fontFamily: "Inter-Regular", // Thay đổi font
-        textAlign: "center",
+        fontFamily: "PlayfairDisplay-Regular", // Thay đổi font
     },
     inputWrapper: {
         flexDirection: "row",
@@ -197,7 +158,7 @@ const styles = StyleSheet.create({
         color: "white",
         flex: 1,
         fontSize: 16,
-        fontFamily: "Inter-Regular", // Thay đổi font
+        fontFamily: "PlayfairDisplay-Regular", // Thay đổi font
     },
     signInButton: {
         backgroundColor: "#BE0303",
@@ -211,7 +172,7 @@ const styles = StyleSheet.create({
     },
     signInText: {
         color: "white",
-        fontFamily: "Inter-Bold", // Thay đổi font
+        fontFamily: "PlayfairDisplay-Bold", // Thay đổi font
     },
     guestButton: {
         backgroundColor: "#666",
@@ -221,7 +182,7 @@ const styles = StyleSheet.create({
     },
     guestText: {
         color: "white",
-        fontFamily: "Inter-Bold", // Thay đổi font
+        fontFamily: "PlayfairDisplay-Bold", // Thay đổi font
     },
     footer: {
         flexDirection: "row",
@@ -230,35 +191,11 @@ const styles = StyleSheet.create({
     },
     footerText: {
         color: "#ccc",
-        fontFamily: "Inter-Regular", // Thay đổi font
+        fontFamily: "PlayfairDisplay-Regular", // Thay đổi font
     },
     signUpText: {
         color: "#fff",
-        fontFamily: "Inter-Bold", // Thay đổi font
-    },
-    testButton: {
-        backgroundColor: 'transparent',
-        borderWidth: 1,
-        borderColor: '#fff',
-        borderRadius: 8,
-        paddingVertical: 12,
-        marginTop: 10,
-        alignItems: 'center',
-    },
-    testText: {
-        color: '#fff',
-        fontSize: 16,
-    },
-    networkInfo: {
-        marginTop: 20,
-        padding: 10,
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        borderRadius: 5,
-    },
-    networkInfoText: {
-        color: '#aaa',
-        fontSize: 10,
-        fontFamily: "Inter-Regular",
+        fontFamily: "PlayfairDisplay-Bold", // Thay đổi font
     },
 });
 

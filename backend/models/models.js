@@ -1,17 +1,11 @@
 const { Sequelize, DataTypes } = require('sequelize');
-require('dotenv').config();
 
 // Khởi tạo kết nối Sequelize
-const sequelize = new Sequelize(
-  process.env.DB_NAME || 'muse_art',
-  process.env.DB_USER || 'root',
-  process.env.DB_PASSWORD || 'Vuniem131104@',
-  {
-    host: process.env.DB_HOST || 'localhost',
-    dialect: process.env.DB_DIALECT || 'mysql', 
-    logging: false, // set true để xem SQL queries
-  }
-);
+const sequelize = new Sequelize('muse_art', 'root', '123456', {
+  host: 'localhost',
+  dialect: 'mysql', 
+  logging: false, // set true để xem SQL queries
+});
 
 // Định nghĩa các model
 const User = sequelize.define('User', {
@@ -476,36 +470,6 @@ const CartItem = sequelize.define('CartItem', {
   ]
 });
 
-// Định nghĩa Feedback model
-const Feedback = sequelize.define('Feedback', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-    allowNull: false
-  },
-  user_id: {
-    type: DataTypes.INTEGER,
-    allowNull: true
-  },
-  content: {
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
-  rating: {
-    type: DataTypes.INTEGER,
-    allowNull: true
-  },
-  created_at: {
-    type: DataTypes.DATE,
-    defaultValue: Sequelize.fn('NOW'),
-    allowNull: false
-  }
-}, {
-  tableName: 'feedback',
-  timestamps: false
-});
-
 // Thiết lập các mối quan hệ
 
 // Artwork - Author
@@ -674,15 +638,6 @@ StoreItem.hasMany(CartItem, {
   as: 'inCarts'
 });
 
-// Feedback - User
-Feedback.belongsTo(User, { 
-  foreignKey: 'user_id' 
-});
-User.hasMany(Feedback, { 
-  foreignKey: 'user_id',
-  as: 'feedbacks'
-});
-
 module.exports = {
   sequelize,
   User,
@@ -701,6 +656,5 @@ module.exports = {
   ArticleTag,
   Bookmark,
   StoreItem,
-  CartItem,
-  Feedback
+  CartItem
 };

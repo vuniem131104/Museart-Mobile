@@ -10,6 +10,9 @@ from langchain.chains import create_retrieval_chain, create_history_aware_retrie
 from langchain_chroma import Chroma
 import os 
 import shutil
+from pydub import AudioSegment
+from faster_whisper import WhisperModel
+import tempfile
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, UploadFile, File
 from fastapi.responses import JSONResponse
@@ -21,7 +24,7 @@ load_dotenv()
 
 app = FastAPI()
 
-llm = ChatGroq(api_key=os.getenv("GROQ_API_KEY"), model="llama3-70b-8192")
+# llm = ChatGroq(api_key=os.getenv("GROQ_API_KEY"), model="llama3-70b-8192")
 
 # prompt = ChatPromptTemplate.from_template(
 #     """
@@ -157,11 +160,22 @@ async def image_search(file: UploadFile = File(...)):
     #     })
     return JSONResponse(content={"answer": answer})
 
+model = WhisperModel("base")
+
+@app.post("/speech-to-text")
+async def speech_to_text(audio: UploadFile = File(...)):
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
+        temp_path = temp_file.name
+        audio_data = await audio.read()
+        temp_file.write(audio_data)
+
+    # Transcribe using Whisper
+    segments, _ = model.transcribe(temp_path)
+    transcript = ''.join([segment.text for segment in segments])
+
+    return {"text": transcript}
+
+
 if __name__ == "__main__":
-    # uvicorn.run("main:app", port=8000, host="0.0.0.0", reload=True)
-    input_text = "Hello"
-    print(llm)
-    answer = llm.invoke([
-        {"role": "user", "content": input_text}
-    ])
-    print(answer.content)
+    uvicorn.run("main:app", port=8000, host="0.0.0.0", reload=True)
+

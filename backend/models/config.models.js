@@ -4,7 +4,7 @@ require('dotenv').config();
 const sequelize = new Sequelize(
   process.env.DB_NAME || 'muse_art',
   process.env.DB_USER || 'root',
-  process.env.DB_PASSWORD || 'Vuniem131104@',
+  process.env.DB_PASSWORD || '123456',
   {
     host: process.env.DB_HOST || 'localhost',
     dialect: process.env.DB_DIALECT || 'mysql',
@@ -17,5 +17,3 @@ const sequelize = new Sequelize(
     }
   }
 );
-
-module.exports = { sequelize };

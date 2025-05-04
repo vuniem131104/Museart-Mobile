@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 10,
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'PlayfairDisplay-Regular',
   },
   scrollView: {
     flexGrow: 1,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: 'Inter-Bold',
+    fontFamily: 'PlayfairDisplay-Bold',
     marginBottom: 8,
   },
   profileCard: {
@@ -280,23 +280,23 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'PlayfairDisplay-Regular',
     marginBottom: 8,
   },
   value: {
     fontSize: 18,
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'PlayfairDisplay-Regular',
   },
   helperText: {
     fontSize: 12,
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'PlayfairDisplay-Regular',
     marginTop: 4,
   },
   input: {
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'PlayfairDisplay-Regular',
   },
   button: {
     padding: 14,
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    fontFamily: 'Inter-Bold',
+    fontFamily: 'PlayfairDisplay-Bold',
   },
   editButton: {
     backgroundColor: '#3366BB',
@@ -322,43 +322,6 @@ const styles = StyleSheet.create({
   cancelButton: {
     flex: 1,
     marginRight: 10,
-  },
-  userInfoText: {
-    fontSize: 16,
-    color: '#333',
-    fontFamily: 'Inter-Regular',
-  },
-  userInfoLabel: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    color: '#000',
-    fontFamily: 'Inter-Bold',
-  },
-  menuItemText: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#333',
-    fontFamily: 'Inter-Regular',
-  },
-  versionText: {
-    fontSize: 14,
-    color: '#999',
-    fontFamily: 'Inter-Regular',
-  },
-  footerText: {
-    fontSize: 12,
-    color: '#888',
-    fontFamily: 'Inter-Regular',
-  },
-  logoutText: {
-    color: '#FF3B30',
-    fontSize: 16,
-    fontFamily: 'Inter-Regular',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    fontFamily: 'Inter-Bold',
   },
 });
 
