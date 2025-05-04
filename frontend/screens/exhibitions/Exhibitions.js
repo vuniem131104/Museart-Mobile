@@ -118,7 +118,7 @@ const Exhibitions = () => {
         onFramePressablePress={() => {
           navigation.navigate('ExhibitionDetail', { ID: item.id })
         }}
-        frameImage={item.image_url}
+        frameImage={item.image_url ? item.image_url : "https://artic-web.imgix.net/7346bacd-9c74-471c-9a33-a45e963d9828/exh_Global-View_main_1_480.jpg?auto=compress%2Cformat&fit=min&fm=jpg&q=80&rect=%2C%2C%2C"}
         title={item.title}
       />
     )

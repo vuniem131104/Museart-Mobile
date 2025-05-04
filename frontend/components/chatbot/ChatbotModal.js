@@ -17,7 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const { width, height } = Dimensions.get('window');
 
-const API_URL = 'http://192.168.39.105:8000'; 
+const API_URL = 'http://192.168.1.11:8000'; 
 
 const getChatResponse = async (userMessage) => {
   try {

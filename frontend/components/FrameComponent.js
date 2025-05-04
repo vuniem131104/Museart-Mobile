@@ -9,6 +9,24 @@ const FrameComponent = ({
     text,
 }) => {
     const { colors } = useTheme();
+    const [isValidImage, setIsValidImage] = React.useState(false);
+
+    // Check image URL validity
+    React.useEffect(() => {
+        const checkImage = async () => {
+            try {
+                await Image.prefetch(frameImage);
+                setIsValidImage(true);
+            } catch (error) {
+                console.log("Invalid image URL:", frameImage);
+                setIsValidImage(false);
+            }
+        };
+
+        if (frameImage) {
+            checkImage();
+        }
+    }, [frameImage]);
 
     return (
         <Pressable
@@ -19,7 +37,7 @@ const FrameComponent = ({
             }}
         >
             <Image
-                source={{ uri: frameImage }}
+                source={{ uri: isValidImage ? frameImage : "https://www.artic.edu/iiif/2/cb76f25a-8727-135b-ce1a-f4423cb3021c/full/843,/0/default.jpg" }}
                 style={{ width: "100%", height: "auto", aspectRatio: 1, borderRadius: 16 }}
             />
             <View style={styles.textContainer}>
@@ -50,14 +68,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     title: {
-        fontFamily: "PlayfairDisplay-Bold",
+        fontFamily: "Inter-Bold",
         fontSize: 15,
         textAlign: "center",
     },
     subtitle: {
-        fontFamily: "PlayfairDisplay-Regular",
+        fontFamily: "Inter-Regular",
         fontSize: 15,
-        // fontStyle: "italic",
         textAlign: "center",
         marginTop: 4,
     },

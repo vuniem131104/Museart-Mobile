@@ -26,9 +26,9 @@ export const Color = {
 };
 /* fonts */
 export const FontFamily = {
-  typographyLabelLarge: "PlayfairDisplay-Regular",
-  labelMediumBold: "PlayfairDisplay-Bold",
-  labelLargeMedium: "PlayfairDisplay-Medium",
+  typographyLabelLarge: "Inter-Regular",
+  labelMediumBold: "Inter-Bold",
+  labelLargeMedium: "Inter-Medium",
 };
 /* font sizes */
 export const FontSize = {

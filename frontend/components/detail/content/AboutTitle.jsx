@@ -16,7 +16,7 @@ const AboutTitle = ({ title, tagRoute, tagDetail, isPrice, price }) => {
     <View style={styles.containerartworktitleParent}>
       <View style={styles.containerartworktitle}>
         <Text
-          style={{ color: colors.onSurface, fontSize: 23, fontFamily: "PlayfairDisplay-Bold" }}
+          style={{ color: colors.onSurface, fontSize: 23, fontFamily: "Inter-Bold" }}
         >
           {title}
         </Text>

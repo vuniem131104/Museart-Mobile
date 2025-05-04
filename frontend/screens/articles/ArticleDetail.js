@@ -65,7 +65,9 @@ const styles = StyleSheet.create({
         padding: Padding.p_3xs,
         flexDirection: "column",
         gap: 15,
-        alignSelf: "stretch"
+        alignSelf: "stretch",
+        marginBottom: 100,
+        // paddingBottom: 300,
     },
     thereAreManySpaceBlock: {
         marginTop: 15,

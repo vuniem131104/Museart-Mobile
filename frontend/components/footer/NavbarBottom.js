@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useSelector } from "react-redux";
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { Padding, Border } from "../../GlobalStyles";
 import { useTheme } from "@react-navigation/native";
+import { AuthContext } from "../../context/authContext";
 
 const NavbarBottom = ({ state, descriptors, navigation }) => {
   const isDarkMode = useSelector(state => state.theme.isDarkMode);
   const { colors } = useTheme();
+  const { userToken } = useContext(AuthContext);
+
   return (
     <View style={[styles.navbarbottom, { backgroundColor: colors.surfaceContainer, shadowColor: colors.primaryShadow }]}>
       {state.routes.map((route, index) => {
@@ -32,6 +35,14 @@ const NavbarBottom = ({ state, descriptors, navigation }) => {
         }
         if (route.name === "Shopping") {
           iconPath = isDarkMode ? require("../../assets/Frame34.png") : require("../../assets/shoppingicon.png")
+        }
+        if (route.name === "Profile") {
+          iconPath = isDarkMode ? require("../../assets/group-19.png") : require("../../assets/group-19.png")
+        }
+
+        // Skip rendering the Profile tab if there's no user token
+        if (route.name === "Profile" && !userToken) {
+          return null;
         }
 
         const onPress = () => {
@@ -68,7 +79,7 @@ const NavbarBottom = ({ state, descriptors, navigation }) => {
               contentFit="cover"
               source={iconPath}
             />
-            {isFocused ? <Text className={'pl-1 font-playfairBold'} style={{ color: colors.onSurface, fontFamily: "PlayfairDisplay-Bold", marginLeft: 5 }}>{label}</Text> : null}
+            {isFocused ? <Text className={'pl-1 font-interBold'} style={{ color: colors.onSurface, fontFamily: "Inter-Bold", marginLeft: 5 }}>{label}</Text> : null}
           </TouchableOpacity>
         );
       })}

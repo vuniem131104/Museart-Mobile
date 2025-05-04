@@ -62,7 +62,7 @@ const DashboardSearchEngine = () => {
   const renderItem = ({ item }) => {
     return (
       <TouchableOpacity onPress={() => { handlePress(item.id) }}>
-        <Text numberOfLines={1} style={{ color: colors.onSurface, fontFamily: "PlayfairDisplay-Regular" }}>{item.title}</Text>
+        <Text numberOfLines={1} style={{ color: colors.onSurface, fontFamily: "Inter-Regular" }}>{item.title}</Text>
       </TouchableOpacity>
     );
   };
@@ -182,7 +182,7 @@ const DashboardSearchEngine = () => {
                   borderRadius: 10,
                   alignSelf: 'center',
                 }}>
-                <Text style={{ color: colors.onSurfaceVarient, fontFamily: "PlayfairDisplay-Bold" }}>
+                <Text style={{ color: colors.onSurfaceVarient, fontFamily: "Inter-Bold" }}>
                   Load more {'>'}
                 </Text>
               </TouchableOpacity>

@@ -9,12 +9,12 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                playfair: ['PlayfairDisplay-Regular', 'serif'],
-                playfairBold: ['PlayfairDisplay-Bold', 'serif'],
-                playfairMedium: ['PlayfairDisplay-Medium', 'serif'],
-                playfairRegular: ['PlayfairDisplay-Regular', 'serif'],
-                playfairSemibold: ['PlayfairDisplay-Semibold', 'serif'],
-                playfairLight: ['PlayfairDisplay-Light', 'serif'],
+                inter: ['Inter-Regular', 'sans-serif'],
+                interBold: ['Inter-Bold', 'sans-serif'],
+                interMedium: ['Inter-Medium', 'sans-serif'],
+                interRegular: ['Inter-Regular', 'sans-serif'],
+                interSemibold: ['Inter-SemiBold', 'sans-serif'],
+                interLight: ['Inter-Light', 'sans-serif'],
             },
             fontSize: {
                 base: '1rem',

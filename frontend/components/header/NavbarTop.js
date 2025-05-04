@@ -1,13 +1,12 @@
 import React from "react";
 import { useState } from "react";
-import { StyleSheet, Image, Pressable, Modal, SafeAreaView, Dimensions, StatusBar, TouchableOpacity } from "react-native";
+import { StyleSheet, Image, Pressable, Modal, SafeAreaView, View, StatusBar, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import { Border, Padding } from "../../GlobalStyles";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import SettingsMenu from "./SettingsMenu";
 import ChatbotModal from "../chatbot/ChatbotModal"; // Import the ChatbotModal component
 
 const NavbarTop = () => {
-
   const navigation = useNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isChatbotVisible, setChatbotVisible] = useState(false); // New state for chatbot modal
@@ -19,6 +18,19 @@ const NavbarTop = () => {
     const prevRoute = routes[routes.length - 2];
     if (navigation.canGoBack() && (prevRoute != null)) navigation.goBack();
   };
+
+  const openMenu = () => {
+    setIsModalVisible(true);
+  };
+
+  const closeMenu = () => {
+    setIsModalVisible(false);
+  };
+
+  // Log when menu is opened or closed for debugging
+  React.useEffect(() => {
+    console.log('Menu visibility changed to:', isModalVisible);
+  }, [isModalVisible]);
 
   return (
     <SafeAreaView style={styles.navbartop}>
@@ -40,7 +52,10 @@ const NavbarTop = () => {
         />
       </Pressable>
       
-      <Pressable onPress={() => { setIsModalVisible(true) }} style={[styles.iconContainer, { backgroundColor: colors.primary }]}>
+      <Pressable 
+        onPress={openMenu} 
+        style={[styles.iconContainer, { backgroundColor: colors.primary }]}
+      >
         <Image
           contentFit="cover"
           source={require("../../assets/frame-45.png")}
@@ -51,11 +66,19 @@ const NavbarTop = () => {
       <Modal
         visible={isModalVisible}
         transparent={true}
+        animationType="fade"
+        onRequestClose={closeMenu}
+        statusBarTranslucent={true}
       >
-        <TouchableOpacity onPressOut={() => setIsModalVisible(false)}
-          style={{ flex: 1 }}>
-          <SettingsMenu />
-        </TouchableOpacity>
+        <TouchableWithoutFeedback onPress={closeMenu}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.menuContainer}>
+                <SettingsMenu closeMenu={closeMenu} />
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
       </Modal>
 
       {/* Chatbot Modal */}
@@ -67,7 +90,6 @@ const NavbarTop = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: "row",
@@ -77,12 +99,21 @@ const styles = StyleSheet.create({
     width: 35,
   },
   navbartop: {
-    // width: "100%",
     alignSelf: "stretch",
     justifyContent: "space-between",
     flexDirection: "row",
     margin: 10,
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+  },
+  menuContainer: {
+    marginTop: 90,
+    marginRight: 5,
+  }
 });
 
 export default NavbarTop;
