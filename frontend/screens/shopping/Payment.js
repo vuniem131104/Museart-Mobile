@@ -13,58 +13,55 @@ const Payment = () => {
 
     const { colors } = useTheme();
     const route = useRoute();
-    
+
     const { Amount, Price } = route.params;
-    const [name, setName] = useState("");
-    const [numberPhone, setNumberPhone] = useState("");
-    const [ward, setWard] = useState("");
-    const [province, setProvince] = useState("");
-    const [address, setAddress] = useState("");
-    const [payMethod, setPayMethod] = useState(0);
-    const [success, setSuccess] = useState(0);
+    const [ name, setName ] = useState("");
+    const [ numberPhone, setNumberPhone ] = useState("");
+    const [ ward, setWard ] = useState("");
+    const [ province, setProvince ] = useState("");
+    const [ address, setAddress ] = useState("");
+    const [ payMethod, setPayMethod ] = useState(0);
+    const [ success, setSuccess ] = useState(0);
     const checkValid = () => {
         return name != "" && numberPhone != "" && ward != "" && province != "" && address != "" && payMethod != 0;
     }
     return (
-        <View style={[styles.paymentContainer, {backgroundColor: colors.surfaceContainer}]}>
+        <View style={[ styles.paymentContainer, { backgroundColor: colors.surfaceContainer } ]}>
             <NavbarTop />
             <View style={{ padding: 10, justifyContent: "center", alignSelf: "stretch" }}>
                 <View style={styles.dashboardtitleFlexBox}>
-                    <Text style={[styles.headline, {color: colors.onSurface}]}>Payment</Text>
+                    <Text style={[ styles.headline, { color: colors.onSurface } ]}>Payment</Text>
                 </View>
-                <View style={[styles.totalContainer, {backgroundColor: colors.surfaceContainerHigh, shadowColor: colors.primaryShadow}]}>
+                <View style={[ styles.totalContainer, { backgroundColor: colors.surfaceContainerHigh, shadowColor: colors.primaryShadow } ]}>
                     <View style={{ marginBottom: 15 }}>
-                        <View style={{ marginBottom: 15 }}>
-                            <Text style={[styles.headline, styles.headline1, , {color: colors.onSurface}]}>Total</Text>
-                        </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                            <Text style={styles.text1}>Number of products</Text>
-                            <Text style={[styles.text1, {color: colors.onSurface}]}>{Amount}</Text>
+                            <Text style={styles.text2}>Number of products</Text>
+                            <Text style={[ styles.text2, { color: colors.onSurface } ]}>{Amount}</Text>
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                             <Text style={styles.text2}>Total</Text>
-                            <Text style={[styles.text2, {color: colors.onSurface}]}>${Price}</Text>
+                            <Text style={[ styles.text2, { color: colors.onSurface } ]}>${Price}</Text>
                         </View>
                     </View>
                     <View style={{ marginBottom: 15 }}>
                         <View style={{ marginBottom: 15 }}>
-                            <Text style={[styles.headline, styles.headline1, {color: colors.onSurface}]}>Information</Text>
+                            <Text style={[ styles.headline, styles.headline1, { color: colors.onSurface } ]}>Information</Text>
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                            <View style={[styles.textInContainer, {backgroundColor: colors.surfaceContainerHighest}]}>
+                            <View style={[ styles.textInContainer, { backgroundColor: colors.surfaceContainerHighest } ]}>
                                 <TextInput
                                     placeholder="Your Name"
                                     placeholderTextColor={colors.onSurfaceVarient}
-                                    style={[styles.textLayout, {color: colors.onSurface}]}
+                                    style={[ styles.textLayout, { color: colors.onSurface } ]}
                                     value={name}
                                     onChangeText={(text) => setName(text)}
                                 />
                             </View>
-                            <View style={[styles.textInContainer, {backgroundColor: colors.surfaceContainerHighest}, { marginLeft: 15 }]}>
+                            <View style={[ styles.textInContainer, { backgroundColor: colors.surfaceContainerHighest }, { marginLeft: 15 } ]}>
                                 <TextInput
                                     placeholder="Your Number"
                                     placeholderTextColor={colors.onSurfaceVarient}
-                                    style={[styles.textLayout, {color: colors.onSurface}]}
+                                    style={[ styles.textLayout, { color: colors.onSurface } ]}
                                     value={numberPhone}
                                     onChangeText={(text) => setNumberPhone(text)}
                                 />
@@ -73,35 +70,35 @@ const Payment = () => {
                     </View>
                     <View style={{ marginBottom: 15 }}>
                         <View style={{ marginBottom: 15 }}>
-                            <Text style={[styles.headline, styles.headline1, {color: colors.onSurface}]}>Address</Text>
+                            <Text style={[ styles.headline, styles.headline1, { color: colors.onSurface } ]}>Address</Text>
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                            <View style={[styles.textInContainer, {backgroundColor: colors.surfaceContainerHighest}]}>
+                            <View style={[ styles.textInContainer, { backgroundColor: colors.surfaceContainerHighest } ]}>
                                 <TextInput
                                     placeholder="Your Wands"
                                     placeholderTextColor={colors.onSurfaceVarient}
-                                    style={[styles.textLayout, {color: colors.onSurface}]}
+                                    style={[ styles.textLayout, { color: colors.onSurface } ]}
                                     value={ward}
                                     onChangeText={(text) => setWard(text)}
                                 />
                             </View>
-                            <View style={[styles.textInContainer, {backgroundColor: colors.surfaceContainerHighest}, { marginLeft: 15 }]}>
+                            <View style={[ styles.textInContainer, { backgroundColor: colors.surfaceContainerHighest }, { marginLeft: 15 } ]}>
                                 <TextInput
                                     placeholder="Your Province"
                                     placeholderTextColor={colors.onSurfaceVarient}
-                                    style={[styles.textLayout, {color: colors.onSurface}]}
+                                    style={[ styles.textLayout, { color: colors.onSurface } ]}
                                     value={province}
                                     onChangeText={(text) => setProvince(text)}
                                 />
                             </View>
                         </View>
                         <View style={{ flexDirection: "row" }}>
-                            <View style={[styles.textInContainer, {backgroundColor: colors.surfaceContainerHighest}, { marginTop: 15 }]}>
+                            <View style={[ styles.textInContainer, { backgroundColor: colors.surfaceContainerHighest }, { marginTop: 15 } ]}>
                                 <Image source={require("../../assets/frame-83.png")} />
                                 <TextInput
                                     placeholder="Your detail address"
                                     placeholderTextColor={colors.onSurfaceVarient}
-                                    style={[styles.textLayout, {color: colors.onSurface}]}
+                                    style={[ styles.textLayout, { color: colors.onSurface } ]}
                                     value={address}
                                     onChangeText={(text) => setAddress(text)}
                                 />
@@ -110,32 +107,72 @@ const Payment = () => {
                     </View>
                     <View style={{ marginBottom: 15 }}>
                         <View style={{ marginBottom: 15 }}>
-                            <Text style={[styles.headline, styles.headline1, {color: colors.onSurface}]}>Pay method</Text>
+                            <Text style={[ styles.headline, styles.headline1, { color: colors.onSurface } ]}>Pay method</Text>
                         </View>
-                        <View style={{ flexDirection: "row", justifyContent: "flex-start" }}>
-                            <ButtonPrimary
-                                image={require("../../assets/frame.png")}
-                                buttonPrimaryBackgroundColor={colors.surfaceContainerHighest}
-                                buttonPrimaryBorderWidth={payMethod === 1 ? 2 : 0}
-                                onPressButton={() => setPayMethod(1)}
-                            />
-                            <ButtonPrimary
-                                image={require("../../assets/frame1.png")}
-                                buttonPrimaryBackgroundColor={ colors.surfaceContainerHighest}
-                                buttonPrimaryMarginLeft={15}
-                                buttonPrimaryBorderWidth={payMethod === 2 ? 2 : 0}
-                                onPressButton={() => setPayMethod(2)}
-                            />
-                            <ButtonPrimary
-                                image={require("../../assets/frame2.png")}
-                                buttonPrimaryBackgroundColor={ colors.surfaceContainerHighest}
-                                buttonPrimaryMarginLeft={15}
-                                buttonPrimaryBorderWidth={payMethod === 3 ? 2 : 0}
-                                onPressButton={() => setPayMethod(3)}
-                            />
+
+                        <View style={{
+                            flexDirection: "row",
+                            flexWrap: "wrap",
+                            justifyContent: "space-between",
+                            gap: 10, // Nếu chưa hỗ trợ `gap`, dùng `marginBottom`
+                        }}>
+                            <View style={{ width: "48%" }}>
+                                <ButtonPrimary
+                                    image={require("../../assets/frame.png")}
+                                    buttonPrimaryBackgroundColor={colors.surfaceContainerHighest}
+                                    buttonPrimaryBorderWidth={payMethod === 1 ? 2 : 0}
+                                    onPressButton={() => setPayMethod(1)}
+                                />
+                            </View>
+
+                            <View style={{ width: "48%" }}>
+                                <ButtonPrimary
+                                    image={require("../../assets/frame1.png")}
+                                    buttonPrimaryBackgroundColor={colors.surfaceContainerHighest}
+                                    buttonPrimaryBorderWidth={payMethod === 2 ? 2 : 0}
+                                    onPressButton={() => setPayMethod(2)}
+                                />
+                            </View>
+
+                            <View style={{ width: "48%" }}>
+                                <ButtonPrimary
+                                    image={require("../../assets/frame2.png")}
+                                    buttonPrimaryBackgroundColor={colors.surfaceContainerHighest}
+                                    buttonPrimaryBorderWidth={payMethod === 3 ? 2 : 0}
+                                    onPressButton={() => setPayMethod(3)}
+                                />
+                            </View>
+
+                            <View style={{ width: "48%" }}>
+                                <ButtonPrimary
+                                    image={require("../../assets/frame2.png")}
+                                    buttonPrimaryBackgroundColor={colors.surfaceContainerHighest}
+                                    buttonPrimaryBorderWidth={payMethod === 4 ? 2 : 0}
+                                    onPressButton={() => setPayMethod(4)}
+                                />
+                            </View>
+
+                            <View style={{ width: "48%" }}>
+                                <ButtonPrimary
+                                    image={require("../../assets/frame2.png")}
+                                    buttonPrimaryBackgroundColor={colors.surfaceContainerHighest}
+                                    buttonPrimaryBorderWidth={payMethod === 5 ? 2 : 0}
+                                    onPressButton={() => setPayMethod(5)}
+                                />
+                            </View>
+
+                            <View style={{ width: "48%" }}>
+                                <ButtonPrimary
+                                    image={require("../../assets/frame2.png")}
+                                    buttonPrimaryBackgroundColor={colors.surfaceContainerHighest}
+                                    buttonPrimaryBorderWidth={payMethod === 6 ? 2 : 0}
+                                    onPressButton={() => setPayMethod(6)}
+                                />
+                            </View>
                         </View>
+
                     </View>
-                    <View style={{ marginTop: 40 }}>
+                    <View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
                             <ButtonPrimary
                                 text={"Cancel"}
@@ -155,11 +192,14 @@ const Payment = () => {
                             />
                         </View>
                     </View>
+                    <View>
+                        <Text style={{ marginTop: 10, textAlign: "center", color: colors.onSurface }}>By clicking Pay now, you agree to our Terms of Service and Privacy Policy</Text>
+                    </View>
                 </View>
-                <Modal visible={success != 0} animationType="fade" transparent={true} style={{flex: 1, justifyContent: "center", alignSelf: "center"}}>
-                    <View style={{flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#000000BF"}}>
-                        <Pressable style={{flex: 1, justifyContent: "center", alignItems: "center"}} onPress={() => setSuccess(0)}>
-                            { success === 1 ? <NotificationSuccess /> : <NotificationFailed /> }
+                <Modal visible={success != 0} animationType="fade" transparent={true} style={{ flex: 1, justifyContent: "center", alignSelf: "center" }}>
+                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#000000BF" }}>
+                        <Pressable style={{ flex: 1, justifyContent: "center", alignItems: "center" }} onPress={() => setSuccess(0)}>
+                            {success === 1 ? <NotificationSuccess /> : <NotificationFailed />}
                         </Pressable>
                     </View>
                 </Modal>
@@ -182,7 +222,8 @@ const styles = StyleSheet.create({
         alignSelf: "flex-start",
     },
     totalContainer: {
-        marginTop: 15,
+        // marginTop: ,
+        marginTop: 20,
         padding: Padding.p_3xs,
         justifyContent: "flex-start",
         elevation: 10,
@@ -212,7 +253,7 @@ const styles = StyleSheet.create({
     text2: {
         fontFamily: FontFamily.labelMediumBold,
         fontSize: FontSize.labelLargeBold_size,
-        color: Color.primaryPrimaryFixed
+        color: "black"
     },
     textInContainer: {
         flex: 1,
@@ -220,7 +261,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRadius: Border.br_81xl,
         flexDirection: "row",
-        padding: Padding.p_mini,
+        padding: 8,
     },
     textLayout: {
         flex: 1,

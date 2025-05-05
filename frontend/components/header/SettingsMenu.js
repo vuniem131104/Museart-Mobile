@@ -815,8 +815,8 @@ const SettingsMenu = ({ closeMenu }) => {
   // Fetch the latest user email from context only
   useEffect(() => {
     // First use what we have in context immediately
-    if (userInfo && userInfo.email) {
-      setUserEmail(userInfo.email);
+    if (userInfo && userInfo.username) {
+      setUserEmail(userInfo.username);
     }
 
     // Only fetch the profile from API if we don't have an email in context

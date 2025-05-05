@@ -22,7 +22,7 @@ const MyFlatList = ({ data, renderItem, isLoading,
                         {renderPaginationButtons()}
                     </View>
                 )}
-                contentContainerStyle={{ paddingBottom: paddingBottom }}
+                contentContainerStyle={{ paddingBottom: paddingBottom, paddingRight: 10, paddingLeft: 10 }}
             />
         </>
     );

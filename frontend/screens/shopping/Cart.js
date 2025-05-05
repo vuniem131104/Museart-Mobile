@@ -12,18 +12,19 @@ import { Color, FontFamily, FontSize, Padding, Border } from "../../GlobalStyles
 const Cart = () => {
     const navigation = useNavigation();
     const { colors } = useTheme();
-    const [isLoading, setLoading] = useState(false);
-    const [products, setProducts] = useState([]);
+    const [ isLoading, setLoading ] = useState(false);
+    const [ products, setProducts ] = useState([]);
     //pagination
-    const [page, setPage] = useState(1);
-    const [numberOfProduct, setNumberOfProduct] = useState(0);
-    const [totalPrice, setTotalPrice] = useState(0);
+    const [ page, setPage ] = useState(1);
+    const [ numberOfProduct, setNumberOfProduct ] = useState(0);
+    const [ totalPrice, setTotalPrice ] = useState(0);
 
     const getProducts = async () => {
         setLoading(true);
         try {
             const response = await axios.get(`${baseUrl}/products?page=${page}`);
-            const productsWithAmount = response.data.data.map(item => ({ ...item, amount: 1 }));
+            const firstFiveProducts = response.data.data.slice(0, 10);
+            const productsWithAmount = firstFiveProducts.map(item => ({ ...item, amount: 1 }));
             setProducts(productsWithAmount);
             setLoading(false);
         } catch (error) {
@@ -71,23 +72,23 @@ const Cart = () => {
     const updateCart = () => {
         const count = products.reduce((count, item) => count += parseInt(item.amount), 0);
         const total = Math.round(100 * products.reduce((sum, item) => sum + item.max_current_price * item.amount, 0)) / 100;
-        
+
         setNumberOfProduct(count);
         setTotalPrice(total);
     }
 
     useEffect(() => {
         getProducts();
-    }, [page]);
+    }, [ page ]);
 
     useEffect(() => {
         updateCart();
-    }, [products]);
+    }, [ products ]);
 
     const handleAmountChange = (id, newAmount) => {
         setProducts((prevProducts) =>
             prevProducts.map((product) =>
-              product.id === id ? { ...product, amount: newAmount } : product
+                product.id === id ? { ...product, amount: newAmount } : product
             )
         );
         updateCart();
@@ -104,105 +105,53 @@ const Cart = () => {
                 image={item.image_url}
                 amount={item.amount}
                 onAmoutChange={handleAmountChange}
-                >
+            >
             </ProductCart>
         )
     }
 
+    // Add to the styles object
     return (
-        <View className={'flex-1'}>
+        <View style={{ flex: 1, position: 'relative' }}>
             {isLoading ? (
                 <ActivityIndicator />
             ) : (
-                <Dashboard namePage={"Carts"}>
-                    <MyFlatList data={products} renderItem={renderItem}
-                        isLoading={isLoading} handleLoading={handleLoading}
-                        renderPaginationButtons={() => <View style={{paddingBottom: 150}}></View>}/>
-                    <View style={{ marginHorizontal: 10 }}>
-                        <View style={[styles.totalContainer, {backgroundColor: colors.surfaceContainerHigh, shadowColor: colors.primaryShadow}]}>
+                <>
+                    <Dashboard namePage={"Carts"}>
+                        <View style={{ height: "100%", }}>
+                            <MyFlatList
+                                data={products}
+                                renderItem={renderItem}
+                                isLoading={isLoading}
+                                handleLoading={handleLoading}
+                                renderPaginationButtons={() => <View style={{ paddingBottom: 400 }}></View>}
+                            />
+                        </View>
+                    </Dashboard>
+
+                    <View style={styles.bottomWrapper}>
+                        <View style={[ styles.totalContainer, { backgroundColor: colors.surfaceContainerHigh, shadowColor: colors.primaryShadow } ]}>
                             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                                 <Text style={styles.text1}>Number of products</Text>
-                                <Text style={[styles.text1, { color: colors.onSurface }]}>{numberOfProduct}</Text>
+                                <Text style={[ styles.text1, { color: colors.onSurface } ]}>{numberOfProduct}</Text>
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
                                 <Text style={styles.text2}>Total</Text>
-                                <Text style={[styles.text2, { color: colors.onSurface }]}>${totalPrice}</Text>
+                                <Text style={[ styles.text2, { color: colors.onSurface } ]}>${totalPrice}</Text>
                             </View>
                             <ButtonPrimary
                                 text={"Pay now"}
                                 buttonPrimaryMarginTop={30}
-                                onPressButton={() => navigation.navigate("Payment", {Amount: numberOfProduct, Price: totalPrice})}
+                                onPressButton={() => navigation.navigate("Payment", { Amount: numberOfProduct, Price: totalPrice })}
                             />
                         </View>
                     </View>
-                </Dashboard>
-            )
-            }
+                </>
+            )}
         </View>
     );
-};
+}
 
-    //     var move = 0;
-    //     const moveAnim = useRef(new Animated.Value(1)).current;
-
-
-    //     const panResponder = useRef(
-    //       PanResponder.create({
-    //         onStartShouldSetPanResponder: () => true,
-    //         onMoveShouldSetPanResponder: (evt, gestureState) => {
-    //           // console.log(gestureState.dy);
-    //           if (gestureState.dy > 5) move = 1;
-    //           else if (gestureState.dy < -5) move = -1;
-    //           return false;
-    //         }
-    //       })
-    //     ).current;
-
-    //       if (move == 1) {
-    //     Animated.timing(moveAnim, {
-    //       toValue: 0,
-    //       duration: 500,
-    //       useNativeDriver: true,
-    //     }).start();
-    //   }
-    //   else if (move == -1) {
-    //     Animated.timing(moveAnim, {
-    //       toValue: 100,
-    //       duration: 1000,
-    //       useNativeDriver: true,
-    //     }).start();
-    //   }
-
-
-    // return (
-    //     <View style={{ flex: 1 }}>
-    //         <Dashboard namePage="Cart">
-    //             <ProductCart title={"Product"} text={"text"} price={"12.20"} image={'https://fastly.picsum.photos/id/20/200/200.jpg?hmac=wHmtG3BEC6aOsGZU_Q2wnxVQq34B__t4x4LFw-sptM8'} number={2}></ProductCart>
-    //             <ProductCart title={"Product"} text={"text"} price={"12.20"} image={'https://fastly.picsum.photos/id/20/200/200.jpg?hmac=wHmtG3BEC6aOsGZU_Q2wnxVQq34B__t4x4LFw-sptM8'} number={2}></ProductCart>
-    //             <ProductCart title={"Product"} text={"text"} price={"12.20"} image={'https://fastly.picsum.photos/id/20/200/200.jpg?hmac=wHmtG3BEC6aOsGZU_Q2wnxVQq34B__t4x4LFw-sptM8'} number={2}></ProductCart>
-
-    //             <View style={{ height: 100 }} />
-    //         </Dashboard>
-    //         <View style={{ marginHorizontal: 15 }}>
-    //             <View style={[styles.totalContainer, isDarkMode ? { backgroundColor: ColorDark.surfaceSurfaceContainerHigh } : null, isDarkMode ? { shadowColor: ColorDark.primaryShadow } : null]}>
-    //                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-    //                     <Text style={styles.text1}>Number of products</Text>
-    //                     <Text style={[styles.text1, { color: Color.surfaceOnSurface }]}>{numberOfProduct}</Text>
-    //                 </View>
-    //                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
-    //                     <Text style={styles.text2}>Total</Text>
-    //                     <Text style={[styles.text2, { color: Color.surfaceOnSurface }]}>${totalAmount}</Text>
-    //                 </View>
-    //                 <ButtonPrimary
-    //                     text={"Pay now"}
-    //                     buttonPrimaryMarginTop={30}
-    //                     onPressButton={() => navigation.navigate("Payment", {Amount: numberOfProduct, Price: totalAmount})}
-    //                 />
-    //             </View>
-    //         </View>
-    //     </View>
-    // );
-// };
 
 const styles = StyleSheet.create({
     text1: {
@@ -215,11 +164,17 @@ const styles = StyleSheet.create({
         fontSize: FontSize.labelLargeBold_size,
         color: Color.primaryPrimaryFixed
     },
-    totalContainer: {
+    bottomWrapper: {
         position: "absolute",
         bottom: 0,
+        left: 0,
+        right: 0,
+        paddingHorizontal: 10,
+        zIndex: 999,
+        backgroundColor: 'transparent',
+    },
+    totalContainer: {
         width: "100%",
-        alignSelf: "center",
         shadowOffset: {
             width: 1,
             height: 1,
