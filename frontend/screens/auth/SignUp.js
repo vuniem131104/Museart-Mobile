@@ -146,20 +146,20 @@ const styles = StyleSheet.create({
         color: "#fff",
         marginTop: 12,
         fontWeight: "bold",
-        fontFamily: "PlayfairDisplay-Bold",
+        fontFamily: "Inter-Bold",
     },
     content: {
         gap: 20,
     },
     title: {
         fontSize: 22,
-        fontFamily: "PlayfairDisplay-Bold",
+        fontFamily: "Inter-Bold",
         color: "#fff",
     },
     subText: {
         fontSize: 16,
         color: "#eee",
-        fontFamily: "PlayfairDisplay-Regular",
+        fontFamily: "Inter-Regular",
     },
     inputWrapper: {
         flexDirection: "row",
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
         color: "white",
         flex: 1,
         fontSize: 16,
-        fontFamily: "PlayfairDisplay-Regular",
+        fontFamily: "Inter-Regular",
     },
     signUpButton: {
         backgroundColor: "#BE0303",
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     },
     signUpText: {
         color: "white",
-        fontFamily: "PlayfairDisplay-Bold",
+        fontFamily: "Inter-Bold",
     },
     footer: {
         flexDirection: "row",
@@ -200,11 +200,11 @@ const styles = StyleSheet.create({
     },
     footerText: {
         color: "#ccc",
-        fontFamily: "PlayfairDisplay-Regular",
+        fontFamily: "Inter-Regular",
     },
     signInText: {
         color: "#fff",
-        fontFamily: "PlayfairDisplay-Bold",
+        fontFamily: "Inter-Bold",
     },
 });
 

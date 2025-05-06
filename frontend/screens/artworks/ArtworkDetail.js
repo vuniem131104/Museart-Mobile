@@ -18,8 +18,8 @@ const ArtworkDetail = () => {
     const { ID } = route.params;
 
     const { colors } = useTheme();
-    const [artwork, setArtwork] = useState([]);
-    const [isLoading, setLoading] = useState(true);
+    const [ artwork, setArtwork ] = useState([]);
+    const [ isLoading, setLoading ] = useState(true);
 
     const getArtwork = async () => {
         try {
@@ -40,7 +40,7 @@ const ArtworkDetail = () => {
     }, []);
 
     return (
-        <View style={[styles.artworkContainer, { backgroundColor: colors.surfaceContainer }]}>
+        <View style={[ styles.artworkContainer, { backgroundColor: colors.surfaceContainer } ]}>
             <NavbarTop />
             {isLoading ? (
                 <ActivityIndicator />
@@ -78,40 +78,62 @@ const ArtworkDetail = () => {
                         />
                     </View>
                     <View style={styles.descriptioncontainerFlexBox}>
-                        <Text style={[styles.description, styles.descriptionFlexBox, { color: colors.onSurface }]}>
+                        {/* <Text style={[styles.description, styles.descriptionFlexBox, { color: colors.onSurface }]}>
                             Description
-                        </Text>
-                        <Text
-                            style={[styles.loremIpsumIsSimply, styles.descriptionFlexBox, { color: colors.onSurface }]}
-                        >
-                            Description:
-                        </Text>
-                        <HTMLRender source={{ html: artwork.description }}
-                                    baseStyle={{color: colors.onSurface,
-                                                fontFamily: FontFamily.typographyLabelLarge,
-                                                fontSize: FontSize.labelLargeBold_size,
-                                                textAlign: "justify",
-                                                alignSelf: "stretch"}}
-                                    contentWidth={Dimensions.get("window").width} />
-                        <Text
-                            style={[styles.loremIpsumIsSimply, styles.descriptionFlexBox, { color: colors.onSurface }]}
-                        >
-                            Provenance: {artwork.provenance_text}
-                        </Text>
-                        <Text
-                            style={[styles.loremIpsumIsSimply, styles.descriptionFlexBox, { color: colors.onSurface }]}
-                        >
-                            Medium: {artwork.medium_display}
-                        </Text>
-                        <Text
-                            style={[styles.loremIpsumIsSimply, styles.descriptionFlexBox, { color: colors.onSurface }]}
-                        >
-                            Publication History: {artwork.publication_history}
-                        </Text>
+                        </Text> */}
+                        <View>
+                            <Text
+                                style={[ styles.loremIpsumIsSimply, styles.descriptionFlexBox, { color: colors.onSurface } ]}
+                            >
+                                Description:
+                            </Text>
+                            <HTMLRender
+                                source={{ html: artwork.description || "<p>This artwork currently has no description available.</p>" }}
+                                baseStyle={{
+                                    color: colors.onSurface,
+                                    fontFamily: FontFamily.typographyLabelLarge,
+                                    fontSize: FontSize.labelLargeBold_size,
+                                    textAlign: "justify",
+                                    alignSelf: "stretch"
+                                }}
+                                tagsStyles={{
+                                    p: { marginTop: 0, marginBottom: 0 },
+                                    div: { marginTop: 0, marginBottom: 0 }
+                                }}
+                                contentWidth={Dimensions.get("window").width}
+                            />
+                        </View>
+                        <View style={{ paddingTop: 10 }}>
+                            <Text style={[ styles.loremIpsumIsSimply, styles.descriptionFlexBox, { color: colors.onSurface } ]}>
+                                Provenance:
+                            </Text>
+                            <Text style={{ fontSize: 16, textAlign: "justify", alignSelf: "stretch" }}>
+                                {artwork.provenance_text || "No provenance information available for this artwork."}
+                            </Text>
+                        </View>
+
+                        <View style={{ paddingTop: 10 }}>
+                            <Text style={[ styles.loremIpsumIsSimply, styles.descriptionFlexBox, { color: colors.onSurface } ]}>
+                                Medium:
+                            </Text>
+                            <Text style={{ fontSize: 16, textAlign: "justify", alignSelf: "stretch" }}>
+                                {artwork.medium_display || "No medium information provided."}
+                            </Text>
+                        </View>
+
+                        <View style={{ paddingTop: 10 }}>
+                            <Text style={[ styles.loremIpsumIsSimply, styles.descriptionFlexBox, { color: colors.onSurface } ]}>
+                                Publication History:
+                            </Text>
+                            <Text style={{ fontSize: 16, textAlign: "justify", alignSelf: "stretch" }}>
+                                {artwork.publication_history_text || "No publication history available for this piece."}
+                            </Text>
+                        </View>
+
                     </View>
                     <Video title={artwork.title} />
                     <Sound title={artwork.title} />
-                    <View style={{paddingBottom: 70}} />
+                    <View style={{ paddingBottom: 70 }} />
                 </ScrollView>
             )}
         </View>
@@ -134,9 +156,10 @@ const styles = StyleSheet.create({
         // fontWeight: "700",
     },
     loremIpsumIsSimply: {
-        fontSize: FontSize.labelLargeBold_size,
+        fontSize: FontSize.titleMediumBold_size,
         fontFamily: FontFamily.typographyLabelLarge,
         alignSelf: "stretch",
+        fontWeight: "700",
     },
     artworkContainer: {
         paddingHorizontal: Padding.p_3xs,

@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
         color: "#fff",
         marginTop: 12,
         fontWeight: "bold",
-        fontFamily: "PlayfairDisplay-Bold", // Thay đổi font
+        fontFamily: "Inter-Bold", // Thay đổi font
     },
     content: {
         gap: 20,
@@ -135,12 +135,12 @@ const styles = StyleSheet.create({
     welcomeText: {
         fontSize: 22,
         color: "#fff",
-        fontFamily: "PlayfairDisplay-Bold", // Thay đổi font
+        fontFamily: "Inter-Bold", // Thay đổi font
     },
     subText: {
         fontSize: 16,
         color: "#eee",
-        fontFamily: "PlayfairDisplay-Regular", // Thay đổi font
+        fontFamily: "Inter-Regular", // Thay đổi font
     },
     inputWrapper: {
         flexDirection: "row",
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
         color: "white",
         flex: 1,
         fontSize: 16,
-        fontFamily: "PlayfairDisplay-Regular", // Thay đổi font
+        fontFamily: "Inter-Regular", // Thay đổi font
     },
     signInButton: {
         backgroundColor: "#BE0303",
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     },
     signInText: {
         color: "white",
-        fontFamily: "PlayfairDisplay-Bold", // Thay đổi font
+        fontFamily: "Inter-Bold", // Thay đổi font
     },
     guestButton: {
         backgroundColor: "#666",
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     },
     guestText: {
         color: "white",
-        fontFamily: "PlayfairDisplay-Bold", // Thay đổi font
+        fontFamily: "Inter-Bold", // Thay đổi font
     },
     footer: {
         flexDirection: "row",
@@ -191,11 +191,11 @@ const styles = StyleSheet.create({
     },
     footerText: {
         color: "#ccc",
-        fontFamily: "PlayfairDisplay-Regular", // Thay đổi font
+        fontFamily: "Inter-Regular", // Thay đổi font
     },
     signUpText: {
         color: "#fff",
-        fontFamily: "PlayfairDisplay-Bold", // Thay đổi font
+        fontFamily: "Inter-Bold", // Thay đổi font
     },
 });
 

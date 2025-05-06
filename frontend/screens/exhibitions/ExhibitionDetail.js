@@ -16,8 +16,8 @@ const ExhibitionDetail = () => {
     const route = useRoute();
     const { ID } = route.params;
 
-    const [exhibition, setExhibition] = useState([]);
-    const [isLoading, setLoading] = useState(true);
+    const [ exhibition, setExhibition ] = useState([]);
+    const [ isLoading, setLoading ] = useState(true);
     const { colors } = useTheme();
 
     const getExhibition = async () => {
@@ -43,7 +43,7 @@ const ExhibitionDetail = () => {
     }, []);
 
     return (
-        <View style={[styles.exhibitionContainer, {backgroundColor: colors.surfaceContainer}]}>
+        <View style={[ styles.exhibitionContainer, { backgroundColor: colors.surfaceContainer } ]}>
             <NavbarTop />
             {isLoading ? (
                 <ActivityIndicator />
@@ -62,11 +62,11 @@ const ExhibitionDetail = () => {
                     <Button />
                     {exhibition.short_description != null &&
                         <View style={styles.descriptioncontainerFlexBox}>
-                            <Text style={[styles.description, {color: colors.onSurface}]}>
+                            <Text style={[ styles.description, { color: colors.onSurface } ]}>
                                 Description
                             </Text>
                             <Text
-                                style={[styles.loremIpsumIsSimply, {color: colors.onSurface}]}
+                                style={[ styles.loremIpsumIsSimply, { color: colors.onSurface } ]}
                             >
                                 {exhibition.short_description}
                             </Text>
@@ -74,23 +74,51 @@ const ExhibitionDetail = () => {
                     }
                     {
                         <View style={styles.descriptioncontainerFlexBox}>
-                            <Text style={[styles.description, {color: colors.onSurface}]}>
+                            <Text style={[ styles.description, { color: colors.onSurface } ]}>
                                 Artworks
                             </Text>
                             <View>
                                 {exhibition.artwork_ids.map((item, index) => {
+                                    const isLastItem = index === exhibition.artwork_ids.length - 1;
                                     return (
-                                        <TouchableHighlight key={item} underlayColor={'gray'} onPress={() => {
-                                            navigation.navigate('ArtworkDetail', { ID: item });
-                                        }}>
-                                            <Text style={[{color: colors.onSurface}]}>{exhibition.artwork_titles[index]}</Text>
-                                        </TouchableHighlight>
+                                        <View key={item}>
+                                            <TouchableHighlight
+                                                underlayColor={'#e0e0e0'}
+                                                onPress={() => {
+                                                    navigation.navigate('ArtworkDetail', { ID: item });
+                                                }}
+                                                style={{
+                                                    borderRadius: 8,
+                                                    overflow: 'hidden',
+                                                    marginBottom: isLastItem ? 0 : 8,
+                                                    marginTop: 8,
+                                                }}
+                                            >
+                                                <View style={{
+                                                    backgroundColor: colors.surfaceContainer,
+                                                    borderRadius: 8,
+                                                    shadowColor: '#000',
+                                                    shadowOffset: { width: 0, height: 1 },
+                                                    shadowOpacity: 0.1,
+                                                    shadowRadius: 2,
+                                                    elevation: 2,
+                                                }}>
+                                                    <Text style={{ color: colors.onSurface, fontSize: 16 }}>{exhibition.artwork_titles[ index ]}</Text>
+                                                </View>
+                                            </TouchableHighlight>
+                                            {!isLastItem && (
+                                                <View style={{
+                                                    height: 1,
+                                                    backgroundColor: '#ccc',
+                                                }} />
+                                            )}
+                                        </View>
                                     );
                                 })}
                             </View>
                         </View>
                     }
-                    <View style={{paddingBottom: 70}} />
+                    <View style={{ paddingBottom: 70 }} />
                 </ScrollView>
             )}
         </View>
@@ -102,6 +130,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginTop: 15,
         alignSelf: "stretch",
+        paddingBottom: 20,
     },
     descriptionFlexBox: {
     },
