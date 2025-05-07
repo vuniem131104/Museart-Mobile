@@ -9,8 +9,10 @@ import { toggleTheme } from "../../store";
 import { useContext, useEffect, useState, useRef } from "react";
 import { AuthContext } from "../../context/authContext";
 import { LinearGradient } from 'expo-linear-gradient';
-import { getUserProfile } from "../../services/userService";
+import { getUserProfile, updateUserProfile } from "../../services/userService";
 import { MaterialIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
+import { Alert } from 'react-native';
 
 const ModalComponent = ({ visible, onClose, title, content, colors }) => {
   const [ fadeAnim ] = useState(new Animated.Value(0));
@@ -206,8 +208,8 @@ const ModalComponent = ({ visible, onClose, title, content, colors }) => {
   );
 };
 
-const EditProfileModal = ({ visible, onClose, userInfo, colors, onUpdate }) => {
-  const [ name, setName ] = useState(userInfo?.name || '');
+const EditProfileModal = ({ visible, onClose, colors }) => {
+  const [ name, setName ] = useState(userInfo?.username || '');
   const [ isLoading, setIsLoading ] = useState(false);
   const [ error, setError ] = useState(null);
   const [ fadeAnim ] = useState(new Animated.Value(0));
@@ -218,12 +220,13 @@ const EditProfileModal = ({ visible, onClose, userInfo, colors, onUpdate }) => {
   const [ newPassword, setNewPassword ] = useState('');
   const [ confirmPassword, setConfirmPassword ] = useState('');
   const [ passwordError, setPasswordError ] = useState(null);
-  const { userToken } = useContext(AuthContext);
+  const { userInfo, userToken, isLoading: authLoading, updateUserInfoState } = useContext(AuthContext);
   const isDarkMode = useSelector(state => state.theme.isDarkMode);
+  const { backendUrl } = require('../../services/api');
 
   React.useEffect(() => {
     if (visible) {
-      setName(userInfo?.name || '');
+      setName(userInfo?.username || '');
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 1,
@@ -265,7 +268,7 @@ const EditProfileModal = ({ visible, onClose, userInfo, colors, onUpdate }) => {
 
   const handleUpdate = async () => {
     if (!name.trim()) {
-      setError('Tên không được để trống');
+      setError('Username cannot be empty');
       return;
     }
 
@@ -273,62 +276,77 @@ const EditProfileModal = ({ visible, onClose, userInfo, colors, onUpdate }) => {
     setError(null);
 
     try {
-      const response = await axios.put('https://engnet.onrender.com/profile/edit',
-        {
-          bio: null,
-          name: name.trim(),
-          avatar: null,
-          banner: null
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${userToken}`,
-            'Content-Type': 'application/json',
-            'accept': '*/*'
-          }
-        }
-      );
+      const updatedData = await updateUserProfile({ username: name.trim() });
 
-      if (response.data.message === "Cập nhật hồ sơ thành công.") {
-        onUpdate(response.data.profile);
+      if (updatedData) {
+        console.log('updatedData', updatedData);
+        await updateUserInfoState({
+          username: updatedData.user.username,
+          email: updatedData.user.email
+        });
+        Alert.alert('Success', 'Profile updated successfully');
         onClose();
       }
     } catch (error) {
-      setError('Có lỗi xảy ra khi cập nhật hồ sơ');
+      setError(error.response?.data?.message || 'Error updating profile');
       console.error('Update profile error:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handlePasswordChange = () => {
+  const handlePasswordChange = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      setPasswordError('Vui lòng điền đầy đủ thông tin');
+      setPasswordError('Please fill in all fields');
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError('Mật khẩu mới không khớp');
+      setPasswordError('New passwords do not match');
       return;
     }
     if (newPassword.length < 6) {
-      setPasswordError('Mật khẩu phải có ít nhất 6 ký tự');
+      setPasswordError('Password must be at least 6 characters');
       return;
     }
 
-    // Fake success message
-    Alert.alert(
-      "Thành công",
-      "Mật khẩu đã được thay đổi",
-      [ {
-        text: "OK", onPress: () => {
-          setShowPasswordChange(false);
-          setCurrentPassword('');
-          setNewPassword('');
-          setConfirmPassword('');
-          setPasswordError(null);
+    setIsLoading(true);
+    setPasswordError(null);
+
+    try {
+      // Since there's no password change API in userService, we'll use the auth context's signin to verify current password
+      // and then update the password through the signup flow
+      const response = await axios.put(`${backendUrl}/auth/change-password`, {
+        currentPassword,
+        newPassword
+      }, {
+        headers: {
+          'x-access-token': userToken,
+          'Content-Type': 'application/json'
         }
-      } ]
-    );
+      });
+
+      if (response.data) {
+        Alert.alert(
+          "Success",
+          "Password changed successfully",
+          [{
+            text: "OK",
+            onPress: () => {
+              setShowPasswordChange(false);
+              setCurrentPassword('');
+              setNewPassword('');
+              setConfirmPassword('');
+              setPasswordError(null);
+            }
+          }]
+        );
+      }
+    } catch (error) {
+      setPasswordError(error.response?.data?.message || 'Error changing password');
+      console.error('Change password error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!visible) return null;
@@ -829,7 +847,8 @@ const SettingsMenu = ({ closeMenu }) => {
           profileFetched.current = true;
           const userData = await getUserProfile();
           if (userData?.email && isMounted.current) {
-            setUserEmail(userData.email);
+            setUserEmail(userData.email || '');
+            setName(userData.username || '');
           }
         } catch (error) {
           console.error("Error loading user email in menu:", error);
@@ -904,13 +923,15 @@ const SettingsMenu = ({ closeMenu }) => {
           colors={colors}
         />
 
-        {/* <EditProfileModal
+        <EditProfileModal
           visible={showEditProfile}
           onClose={() => setShowEditProfile(false)}
-          userInfo={userInfo}
           colors={colors}
-          onUpdate={handleProfileUpdate}
-        /> */}
+          // onUpdate={(updatedInfo) => {
+          //   // Handle profile update
+          //   setUserEmail(updatedInfo.username);
+          // }}
+        />
 
         <MenuItem
           colors={colors}
@@ -929,13 +950,6 @@ const SettingsMenu = ({ closeMenu }) => {
           }}
         />
 
-        {/* <MenuItem 
-        colors={colors} 
-        imageSource={isDarkMode ? require("../../assets/Frame14.png") : require("../../assets/frame-14.png")} 
-        text="Giỏ hàng" 
-        func={() => handleNavigation("Cart")} 
-      /> */}
-
         <MenuItem
           colors={colors}
           isDarkMode={isDarkMode}
@@ -950,9 +964,20 @@ const SettingsMenu = ({ closeMenu }) => {
           text="Cart"
           func={() => handleNavigation("Cart")}
         />
-        {userToken != null && userEmail &&
-          <MenuItem colors={colors} isDarkMode={isDarkMode} imageSource={isDarkMode ? require("../../assets/Explore2.png") : require("../../assets/explore.png")} text={userEmail} />
-        }
+
+        {userToken != null && userEmail && (
+          <TouchableOpacity 
+            style={[styles.profileSection, { backgroundColor: colors.surfaceContainer }]} 
+            onPress={() => setShowEditProfile(true)}
+          >
+            <View style={styles.profileInfo}>
+              <FontAwesome5 name="user-circle" size={20} color={colors.primary} />
+              <Text style={[styles.profileText, { color: colors.onSurface }]}>{userEmail}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={colors.primary} />
+          </TouchableOpacity>
+        )}
+
         {userToken == null ? (
           <View style={[ styles.flexRow, styles.flexRowButton ]}>
             <ButtonPrimary text="Sign in"
@@ -1260,6 +1285,23 @@ const styles = StyleSheet.create({
   versionText: {
     fontSize: FontSize.labelSmall_size,
     fontFamily: FontFamily.labelSmallRegular,
+  },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 15,
+    marginBottom: 10,
+    borderRadius: Border.br_3xs,
+  },
+  profileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  profileText: {
+    fontSize: FontSize.labelLargeBold_size,
+    fontFamily: FontFamily.labelLargeMedium,
   },
 });
 

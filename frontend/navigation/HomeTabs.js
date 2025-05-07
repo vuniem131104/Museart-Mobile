@@ -33,12 +33,12 @@ export default function HomeTabs() {
                 name="Shopping"
                 component={ShoppingStackScreen}
             />
-            {showProfileTab && (
+            {/* {showProfileTab && (
                 <Tab.Screen
                     name="Profile"
                     component={ProfileStackScreen}
                 />
-            )}
+            )} */}
         </Tab.Navigator>
     );
 }

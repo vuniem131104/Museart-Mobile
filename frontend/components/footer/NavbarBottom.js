@@ -36,14 +36,6 @@ const NavbarBottom = ({ state, descriptors, navigation }) => {
         if (route.name === "Shopping") {
           iconPath = isDarkMode ? require("../../assets/Frame34.png") : require("../../assets/shoppingicon.png")
         }
-        if (route.name === "Profile") {
-          iconPath = isDarkMode ? require("../../assets/group-19.png") : require("../../assets/group-19.png")
-        }
-
-        // Skip rendering the Profile tab if there's no user token
-        if (route.name === "Profile" && !userToken) {
-          return null;
-        }
 
         const onPress = () => {
           const event = navigation.emit({
@@ -122,6 +114,5 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
-
 
 export default NavbarBottom;
