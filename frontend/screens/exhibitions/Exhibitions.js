@@ -137,7 +137,7 @@ const Exhibitions = () => {
           <MyFlatList data={exhibitions} renderItem={renderItem}
             isLoading={isLoading} handleLoading={handleLoading}
             renderPaginationButtons={renderPaginationButtons} 
-            paddingBottom={420}
+            paddingBottom={440}
             />
         </Dashboard>
       )}

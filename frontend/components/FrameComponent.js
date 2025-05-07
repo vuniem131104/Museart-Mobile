@@ -6,7 +6,7 @@ const FrameComponent = ({
     onFramePressablePress,
     frameImage,
     title,
-    text,
+    text = null,
 }) => {
     const { colors } = useTheme();
     const [isValidImage, setIsValidImage] = React.useState(false);
@@ -48,14 +48,26 @@ const FrameComponent = ({
                 >
                     {title}
                 </Text>
-                <Text
-                    numberOfLines={2}
-                    ellipsizeMode="tail"
-                    style={[styles.subtitle, { color: colors.onSurface }]}
-                >
-                    {text}
-                </Text>
+                {text !== null ? (
+                    <Text
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                        style={[styles.subtitle, { color: colors.onSurface }]}
+                    >
+                        {text}
+                    </Text>
+                ) : (
+                <Text ></Text>
+                )}
             </View>
+        <View
+            style={{
+                width: "100%",
+                height: 1,
+                backgroundColor: colors.outline,
+                marginTop: 10,
+            }}
+        />
         </Pressable>
     );
 };

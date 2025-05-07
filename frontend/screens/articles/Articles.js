@@ -132,7 +132,7 @@ const Articles = () => {
                     <MyFlatList data={articles} renderItem={renderItem}
                         isLoading={isLoading} handleLoading={handleLoading}
                         renderPaginationButtons={renderPaginationButtons} 
-                        paddingBottom={420}    
+                        paddingBottom={440}    
                         />
                 </Dashboard>
             )

@@ -155,7 +155,7 @@ const Artworks = () => {
                         isLoading={isLoading} 
                         handleLoading={handleLoading}
                         renderPaginationButtons={renderPaginationButtons} 
-                        paddingBottom={257}
+                        paddingBottom={isImageSearch ? 350 : 270}
                     />
                 </Dashboard>
             )}

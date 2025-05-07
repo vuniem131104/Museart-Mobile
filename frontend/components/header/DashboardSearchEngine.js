@@ -10,7 +10,7 @@ import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 
 const DashboardSearchEngine = () => {
-  const API_URL = 'http://192.168.39.105:8000'
+  const API_URL = 'http://192.168.1.11:8000'
   const [ isLoading, setLoading ] = useState(false);
   const [ data, setData ] = useState([]);
   const [ page, setPage ] = useState(1);
@@ -34,7 +34,7 @@ const DashboardSearchEngine = () => {
     try {
       const response = await axios.get(`${baseUrl}/${model}/search?q="${q}"&page=${page}`);
       setData(response.data.data);
-      console.log(data);
+      // console.log(data);
       setTotalpages(response.data.pagination.total_pages);
       setLoading(false);
     } catch (error) {
