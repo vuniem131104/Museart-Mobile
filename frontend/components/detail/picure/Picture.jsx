@@ -6,14 +6,19 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
   Modal,
-  Pressable
+  Pressable,
 } from "react-native";
 import { Image } from "expo-image";
-import BoardExtraInfoArtwork from "./BoardExtraInfoArtwork";
+import BoardExtraInfo from "./BoardExtraInfo";
 import { Border, Color, FontSize, Padding } from "../../../GlobalStyles";
 
-const Picture = ({ imagePath, commentAmount, likeAmount, date, altText }) => {
+const Picture = ({ imagePath, date, altText, id, type }) => {
   const [modalVisible, setModalVisible] = useState(false);
+
+  if (type !== "artwork" && type !== "exhibition") {
+    return null;
+  }
+
   return (
     <ImageBackground
       source={{ uri: imagePath }}
@@ -21,11 +26,7 @@ const Picture = ({ imagePath, commentAmount, likeAmount, date, altText }) => {
       style={styles.picture}
       alt={altText}
     >
-      <BoardExtraInfoArtwork
-        commentAmount={commentAmount}
-        likeAmount={likeAmount}
-        date={date}
-      />
+      <BoardExtraInfo date={date} id={id} type={type} />
       <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
         <Image
           style={styles.fullscreenpictureicon}
@@ -33,14 +34,22 @@ const Picture = ({ imagePath, commentAmount, likeAmount, date, altText }) => {
           source={require("../../../assets/fullscreenpictureicon.png")}
         />
       </TouchableWithoutFeedback>
-      <Modal visible={modalVisible} animationType="fade" transparent={true} style={{flex: 1}}>
-        <Pressable style={{flex: 1, backgroundColor: "rgba(0, 0, 0, 0.85)"}} onPress={() => setModalVisible(false)}>
+      <Modal
+        visible={modalVisible}
+        animationType="fade"
+        transparent={true}
+        style={{ flex: 1 }}
+      >
+        <Pressable
+          style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+          onPress={() => setModalVisible(false)}
+        >
           <ImageBackground
-          style={{ flex: 1 }}
-          source={{ uri: imagePath }}
-          resizeMode="contain"
-          accessibilityLabel={altText}
-           />
+            style={{ flex: 1 }}
+            source={{ uri: imagePath }}
+            resizeMode="contain"
+            accessibilityLabel={altText}
+          />
         </Pressable>
       </Modal>
     </ImageBackground>
