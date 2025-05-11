@@ -5,6 +5,8 @@ const sequelize = require("./models/config.models");
 // Import routes
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
+const exhibitionRoutes = require("./routes/exhibition.routes");
+const artworkRoutes = require("./routes/artwork.routes");
 
 // Khởi tạo Express app
 const app = express();
@@ -21,6 +23,8 @@ app.use(express.urlencoded({ extended: true }));
 // Thiết lập các routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/exhibitions", exhibitionRoutes);
+app.use("/api/artworks", artworkRoutes);
 
 // Route mặc định
 app.get("/", (req, res) => {
