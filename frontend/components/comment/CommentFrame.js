@@ -7,51 +7,67 @@ import axios from "axios";
 import { localhost } from "../../services/api";
 import { AuthContext } from "../../context/authContext";
 
-const CommentFrame = ({
-  id,
-  date,
-  text,
-}) => {
+const CommentFrame = ({ id, username, date, text }) => {
   const { colors } = useTheme();
   const [isLoading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const { userInfo } = useContext(AuthContext);
 
+  // const getUserById = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await axios.get(`${localhost}/auth/${id}`);
+  //     setData(response.data.username);
+  //     console.log(data);
+  //     setLoading(false);
+  //   } catch (error) {
+  //     console.error(error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  const getUserById = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`${localhost}/auth/${id}`);
-      setData(response.data.username);
-      console.log(data);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  React.useEffect(() => {
-    getUserById();
-  }, [])
+  // React.useEffect(() => {
+  //   getUserById();
+  // }, [])
 
   return (
-    <View style={[styles.frameParent, {backgroundColor: colors.surfaceContainerHighest, shadowColor: colors.primaryShadow}]}>
+    <View
+      key={id}
+      style={[
+        styles.frameParent,
+        {
+          backgroundColor: colors.surfaceContainerHighest,
+          shadowColor: colors.primaryShadow,
+        },
+      ]}
+    >
       <View style={styles.usernameParent}>
-        <Text style={[styles.username, styles.usernameTypo, { color: colors.onSurfaceVarient }]}>{data}</Text>
-        <Text style={[styles.ddmmyyyy, styles.usernameTypo, { color: colors.primary }]}>{date}</Text>
+        <Text
+          style={[
+            styles.username,
+            styles.usernameTypo,
+            { color: colors.onSurfaceVarient },
+          ]}
+        >
+          {username}
+        </Text>
+        <Text
+          style={[
+            styles.ddmmyyyy,
+            styles.usernameTypo,
+            { color: colors.primary },
+          ]}
+        >
+          {date}
+        </Text>
       </View>
-      <Text
-        style={[styles.text, { color: colors.onSurface }]}>
-        {text}
-      </Text>
+      <Text style={[styles.text, { color: colors.onSurface }]}>{text}</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-
   usernameTypo: {
     fontFamily: FontFamily.labelMediumBold,
     fontWeight: "700",

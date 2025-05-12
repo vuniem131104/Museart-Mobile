@@ -11,7 +11,7 @@ import { Color, FontFamily, FontSize, Padding } from "../../GlobalStyles";
 import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
 import axios from "axios";
 import { baseUrl } from "../../services/api";
-import Picture from "../../components/detail/picure/Picture";
+import Picture from "../../components/detail/picture/Picture";
 import AboutTitle from "../../components/detail/content/AboutTitle";
 import AboutArtist from "../../components/detail/content/AboutArtist";
 import FrameButton from "../../components/detail/content/FrameButton";

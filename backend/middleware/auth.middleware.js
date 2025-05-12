@@ -1,27 +1,51 @@
-const jwt = require("jsonwebtoken");
-const { User } = require("../models/models");
-const jwtConfig = require("../config/jwt.config");
+const dotenv = require("dotenv");
+const tokenService = require("../services/token.service");
+
+dotenv.config();
 
 const verifyToken = (req, res, next) => {
-  const token = req.headers["x-access-token"];
+  const accessToken = req.headers["x-access-token"];
+  const refreshToken = req.headers["x-refresh-token"];
 
-  if (!token) {
-    return res.status(403).send({
-      message: "Không có token được cung cấp!"
+  if (!accessToken) {
+    return res.status(403).json({
+      message: "No access token provided!",
     });
   }
 
-  jwt.verify(token, jwtConfig.secret, (err, decoded) => {
-    if (err) {
-      return res.status(401).send({
-        message: "Không được phép!"
-      });
-    }
+  // Verify access token
+  const decoded = tokenService.verifyAccessToken(accessToken);
+
+  if (decoded) {
     req.userId = decoded.id;
-    next();
-  });
+    return next();
+  }
+  console.log("Access token is invalid");
+  // If access token is invalid, check refresh token
+  if (!refreshToken) {
+    return res.status(403).json({
+      message: "No refresh token provided!",
+    });
+  }
+
+  const refreshDecoded = tokenService.verifyRefreshToken(refreshToken);
+  if (!refreshDecoded) {
+    return res.status(401).json({
+      message: "Invalid refresh token!",
+    });
+  }
+
+  // Generate new access token
+  const newAccessToken = tokenService.generateAccessToken(refreshDecoded.id);
+
+  // Set new access token in response header
+  res.setHeader("x-new-access-token", newAccessToken);
+  console.log("Refreshed access token");
+  // Set user ID for the request
+  req.userId = refreshDecoded.id;
+  next();
 };
 
 module.exports = {
-  verifyToken
-}; 
+  verifyToken,
+};

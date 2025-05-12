@@ -10,35 +10,26 @@ import { AuthContext } from "../context/authContext";
 
 const Tab = createBottomTabNavigator();
 export default function HomeTabs() {
-    const { userToken, isGuest } = useContext(AuthContext);
+  const { userInfo, isGuest } = useContext(AuthContext);
 
-    // Only show Profile tab if user is authenticated (not in guest mode)
-    const showProfileTab = userToken && !isGuest;
+  // Only show Profile tab if user is authenticated (not in guest mode)
+  const showProfileTab = userInfo && !isGuest;
 
-    return (
-        <Tab.Navigator tabBar={props => <NavbarBottom  {...props} />} screenOptions={{ headerShown: false }}>
-            <Tab.Screen
-                name="Artworks"
-                component={ArtworkStackScreen}
-            />
-            <Tab.Screen
-                name="Exhibitions"
-                component={ExhibitionStackScreen}
-            />
-            <Tab.Screen
-                name="Articles"
-                component={ArticleStackScreen}
-            />
-            <Tab.Screen
-                name="Shopping"
-                component={ShoppingStackScreen}
-            />
-            {/* {showProfileTab && (
+  return (
+    <Tab.Navigator
+      tabBar={(props) => <NavbarBottom {...props} />}
+      screenOptions={{ headerShown: false }}
+    >
+      <Tab.Screen name="Artworks" component={ArtworkStackScreen} />
+      <Tab.Screen name="Exhibitions" component={ExhibitionStackScreen} />
+      <Tab.Screen name="Articles" component={ArticleStackScreen} />
+      <Tab.Screen name="Shopping" component={ShoppingStackScreen} />
+      {/* {showProfileTab && (
                 <Tab.Screen
                     name="Profile"
                     component={ProfileStackScreen}
                 />
             )} */}
-        </Tab.Navigator>
-    );
+    </Tab.Navigator>
+  );
 }

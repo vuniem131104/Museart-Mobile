@@ -9,207 +9,200 @@ import { ActivityIndicator } from "react-native";
 import MyFlatList from "../../components/MyFlatList";
 
 const Artworks = () => {
-    const navigation = useNavigation();
-    const route = useRoute();
-    const [isLoading, setLoading] = useState(false);
-    const [artworks, setArtworks] = useState([]);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
+  const navigation = useNavigation();
+  const route = useRoute();
+  const [isLoading, setLoading] = useState(false);
+  const [artworks, setArtworks] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
-    // Check if we have image search results
-    const imageSearchResults = route.params?.searchResults;
-    const isImageSearch = route.params?.isImageSearch;
+  // Check if we have image search results
+  const imageSearchResults = route.params?.searchResults;
+  const isImageSearch = route.params?.isImageSearch;
 
-    useEffect(() => {
-        if (isImageSearch && imageSearchResults) {
-            setArtworks(imageSearchResults);
-            setTotalPages(1); 
-        } else {
-            getArtworks();
-        }
-    }, [page, isImageSearch, imageSearchResults]);
+  useEffect(() => {
+    if (isImageSearch && imageSearchResults) {
+      setArtworks(imageSearchResults);
+      setTotalPages(1);
+    } else {
+      getArtworks();
+    }
+  }, [page, isImageSearch, imageSearchResults]);
 
-    const getArtworks = async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`${baseUrl}/artworks?page=${page}`);
-            setArtworks(response.data.data);
-            setTotalPages(response.data.pagination.total_pages);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const getArtworks = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${baseUrl}/artworks?page=${page}`);
+      setArtworks(response.data.data);
+      setTotalPages(response.data.pagination.total_pages);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const renderItem = ({ item }) => {
-        return (
-            <FrameComponent
-                key={item.id}
-                onFramePressablePress={() => {
-                    navigation.navigate('ArtworkDetail', { ID: item.id })
-                }}
-                frameImage={`https://www.artic.edu/iiif/2/${item.image_id}/full/843,/0/default.jpg`}
-                title={item.title}
-                text={isImageSearch ? item.alt_text : item.thumbnail?.alt_text}
-            />
-        );
-    };
-
-    const handleLoading = () => {
-        setLoading(true);
-        setTimeout(() => setLoading(false), 1000);
-    };
-
-    const loadMore = (p) => {
-        if (!isImageSearch && p >= 1 && p <= totalPages) {
-            setPage(p);
-        }
-    };
-
-    const renderPaginationButtons = () => {
-        if (isImageSearch || totalPages === 0) return null;
-
-        const maxButtonsToShow = 5;
-        let startPage = 1;
-        const half = Math.floor(maxButtonsToShow / 2);
-
-        if (totalPages > maxButtonsToShow) {
-            if (page <= half + 1) {
-                startPage = 1;
-            } else if (page >= totalPages - half) {
-                startPage = totalPages - maxButtonsToShow + 1;
-            } else {
-                startPage = page - half;
-            }
-        }
-
-        const endPage = Math.min(startPage + maxButtonsToShow - 1, totalPages);
-
-        const buttons = [];
-
-        // ← nút trái
-        buttons.push(
-            <TouchableOpacity
-                key="prev"
-                onPress={() => loadMore(page - 1)}
-                style={styles.arrowButton}
-                disabled={page === 1}
-            >
-                <Text style={styles.arrowText}>{'←'}</Text>
-            </TouchableOpacity>
-        );
-
-        for (let i = startPage; i <= endPage; i++) {
-            buttons.push(
-                <TouchableOpacity
-                    key={i}
-                    onPress={() => loadMore(i)}
-                    style={[
-                        styles.pageButton,
-                        i === page && styles.activePageButton,
-                    ]}
-                >
-                    <Text
-                        style={[
-                            styles.pageButtonText,
-                            i === page && styles.activePageButtonText,
-                        ]}
-                    >
-                        {i}
-                    </Text>
-                </TouchableOpacity>
-            );
-        }
-
-        // → nút phải
-        buttons.push(
-            <TouchableOpacity
-                key="next"
-                onPress={() => loadMore(page + 1)}
-                style={styles.arrowButton}
-                disabled={page === totalPages}
-            >
-                <Text style={styles.arrowText}>{'→'}</Text>
-            </TouchableOpacity>
-        );
-
-        return (
-            <View style={styles.paginationContainer}>
-                {buttons}
-            </View>
-        );
-    };
-
+  const renderItem = ({ item }) => {
     return (
-        <View style={styles.container}>
-            {isLoading ? (
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="#22c55d" />
-                </View>
-            ) : (
-                <Dashboard namePage={"Artworks"}>
-                    <MyFlatList 
-                        data={artworks} 
-                        renderItem={renderItem}
-                        isLoading={isLoading} 
-                        handleLoading={handleLoading}
-                        renderPaginationButtons={renderPaginationButtons} 
-                        paddingBottom={isImageSearch ? 350 : 270}
-                    />
-                </Dashboard>
-            )}
-        </View>
+      <FrameComponent
+        key={item.id}
+        onFramePressablePress={() => {
+          navigation.navigate("ArtworkDetail", { ID: item.id });
+        }}
+        frameImage={`https://www.artic.edu/iiif/2/${item.image_id}/full/843,/0/default.jpg`}
+        title={item.title}
+        text={isImageSearch ? item.alt_text : item.thumbnail?.alt_text}
+      />
     );
+  };
+
+  const handleLoading = () => {
+    setLoading(true);
+    setTimeout(() => setLoading(false), 1000);
+  };
+
+  const loadMore = (p) => {
+    if (!isImageSearch && p >= 1 && p <= totalPages) {
+      setPage(p);
+    }
+  };
+
+  const renderPaginationButtons = () => {
+    if (isImageSearch || totalPages === 0) return null;
+
+    const maxButtonsToShow = 5;
+    let startPage = 1;
+    const half = Math.floor(maxButtonsToShow / 2);
+
+    if (totalPages > maxButtonsToShow) {
+      if (page <= half + 1) {
+        startPage = 1;
+      } else if (page >= totalPages - half) {
+        startPage = totalPages - maxButtonsToShow + 1;
+      } else {
+        startPage = page - half;
+      }
+    }
+
+    const endPage = Math.min(startPage + maxButtonsToShow - 1, totalPages);
+
+    const buttons = [];
+
+    // ← nút trái
+    buttons.push(
+      <TouchableOpacity
+        key="prev"
+        onPress={() => loadMore(page - 1)}
+        style={styles.arrowButton}
+        disabled={page === 1}
+      >
+        <Text style={styles.arrowText}>{"←"}</Text>
+      </TouchableOpacity>
+    );
+
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(
+        <TouchableOpacity
+          key={i}
+          onPress={() => loadMore(i)}
+          style={[styles.pageButton, i === page && styles.activePageButton]}
+        >
+          <Text
+            style={[
+              styles.pageButtonText,
+              i === page && styles.activePageButtonText,
+            ]}
+          >
+            {i}
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+
+    // → nút phải
+    buttons.push(
+      <TouchableOpacity
+        key="next"
+        onPress={() => loadMore(page + 1)}
+        style={styles.arrowButton}
+        disabled={page === totalPages}
+      >
+        <Text style={styles.arrowText}>{"→"}</Text>
+      </TouchableOpacity>
+    );
+
+    return <View style={styles.paginationContainer}>{buttons}</View>;
+  };
+
+  return (
+    <View style={styles.container}>
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#22c55d" />
+        </View>
+      ) : (
+        <Dashboard namePage={"Artworks"}>
+          <MyFlatList
+            data={artworks}
+            renderItem={renderItem}
+            isLoading={isLoading}
+            handleLoading={handleLoading}
+            renderPaginationButtons={renderPaginationButtons}
+            paddingBottom={isImageSearch ? 350 : 270}
+          />
+        </Dashboard>
+      )}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    paginationContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingVertical: 15,
-        paddingBottom: 25,
-        marginBottom: 50,
-    },
-    pageButton: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#808080',
-        marginHorizontal: 5,
-    },
-    activePageButton: {
-        backgroundColor: '#22c55d',
-    },
-    pageButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: '500',
-    },
-    activePageButtonText: {
-        fontWeight: 'bold',
-    },
-    arrowButton: {
-        paddingHorizontal: 5,
-        paddingBottom: 5,
-        backgroundColor: '#d1d5db',
-        borderRadius: 20,
-    },
-    arrowText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
+  container: {
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 15,
+    paddingBottom: 25,
+    marginBottom: 50,
+  },
+  pageButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#808080",
+    marginHorizontal: 5,
+  },
+  activePageButton: {
+    backgroundColor: "#22c55d",
+  },
+  pageButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  activePageButtonText: {
+    fontWeight: "bold",
+  },
+  arrowButton: {
+    paddingHorizontal: 5,
+    paddingBottom: 5,
+    backgroundColor: "#d1d5db",
+    borderRadius: 20,
+  },
+  arrowText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
 });
 
 export default Artworks;

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { registerRootComponent } from 'expo';
-import { AppRegistry } from 'react-native';
+import { registerRootComponent } from "expo";
+import { AppRegistry } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Provider, useSelector } from "react-redux";
@@ -23,15 +23,22 @@ const Stack = createNativeStackNavigator();
 
 // Loading Indicator Component
 const LoadingIndicator = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' }}>
+  <View
+    style={{
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "#000",
+    }}
+  >
     <ActivityIndicator size="large" color="#FFF" />
   </View>
 );
 
 const AppContent = () => {
-  const isDarkMode = useSelector(state => state.theme.isDarkMode);
-  const { userToken, isLoading, isGuest } = useContext(AuthContext);
-  
+  const isDarkMode = useSelector((state) => state.theme.isDarkMode);
+  const { accessToken, isLoading, isGuest } = useContext(AuthContext);
+
   const navigationRef = React.useRef(null);
 
   // Handle navigation resets based on context state
@@ -40,57 +47,59 @@ const AppContent = () => {
 
     if (navigationRef.current) {
       const currentRoute = navigationRef.current.getCurrentRoute()?.name;
-      console.log(`Navigation check: token=${!!userToken}, guest=${isGuest}, currentRoute=${currentRoute}`);
+      console.log(
+        `Navigation check: token=${!!accessToken}, guest=${isGuest}, currentRoute=${currentRoute}`
+      );
 
-      if (!userToken && !isGuest) {
+      if (!accessToken && !isGuest) {
         // If not logged in and not guest, ensure we are on Auth stack
-        if (currentRoute !== 'SignIn' && currentRoute !== 'SignUp') {
-            console.log("Resetting navigation to SignIn");
-            navigationRef.current.reset({
-                index: 0,
-                routes: [{ name: 'SignIn' }],
-            });
+        if (currentRoute !== "SignIn" && currentRoute !== "SignUp") {
+          console.log("Resetting navigation to SignIn");
+          navigationRef.current.reset({
+            index: 0,
+            routes: [{ name: "SignIn" }],
+          });
         }
       } else {
-         // If logged in or guest, ensure we are on the Home stack
-         if (currentRoute === 'SignIn' || currentRoute === 'SignUp') {
-             console.log("Resetting navigation to Home");
-             navigationRef.current.reset({
-                index: 0,
-                routes: [{ name: 'Home' }],
-             });
-         }
+        // If logged in or guest, ensure we are on the Home stack
+        if (currentRoute === "SignIn" || currentRoute === "SignUp") {
+          console.log("Resetting navigation to Home");
+          navigationRef.current.reset({
+            index: 0,
+            routes: [{ name: "Home" }],
+          });
+        }
       }
     }
-  }, [userToken, isGuest, isLoading]); // Depend on loading state as well
-  
+  }, [accessToken, isGuest, isLoading]); // Depend on loading state as well
+
   // Show loading indicator until context is ready
   if (isLoading) {
     return <LoadingIndicator />;
   }
 
   return (
-    <NavigationContainer 
+    <NavigationContainer
       ref={navigationRef}
       theme={isDarkMode ? MyDarkTheme : MyLightTheme}
     >
       <StatusBar />
-      <Stack.Navigator 
+      <Stack.Navigator
         screenOptions={{ headerShown: false }}
         // Initial route determination is less critical now due to useEffect reset,
         // but can provide a slightly faster initial paint.
-        // initialRouteName={userToken || isGuest ? "Home" : "SignIn"}
+        // initialRouteName={accessToken || isGuest ? "Home" : "SignIn"}
       >
-        {userToken || isGuest ? (
+        {accessToken || isGuest ? (
           // Authenticated or Guest Stack
           <>
-            <Stack.Screen 
-              name="Home" 
+            <Stack.Screen
+              name="Home"
               component={HomeTabs}
               // Removed initialParams={{ isGuest }} - get from context now
             />
-            {/* Keep other screens accessible when logged in */} 
-            {userToken && !isGuest && (
+            {/* Keep other screens accessible when logged in */}
+            {accessToken && !isGuest && (
               <>
                 <Stack.Screen name="ProfilePage" component={Profile} />
                 <Stack.Screen name="Cart" component={Cart} />
@@ -106,16 +115,13 @@ const AppContent = () => {
               component={SignIn}
               // Removed initialParams={{ setIsGuest }}
             />
-            <Stack.Screen
-              name="SignUp"
-              component={SignUp}
-            />
+            <Stack.Screen name="SignUp" component={SignUp} />
           </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
 
 const App = () => {
   const [fontsLoaded, error] = useFonts({
@@ -144,5 +150,5 @@ const App = () => {
 };
 
 export default App;
-AppRegistry.registerComponent('main', () => App);
+AppRegistry.registerComponent("main", () => App);
 registerRootComponent(App);
