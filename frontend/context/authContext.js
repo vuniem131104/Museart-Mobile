@@ -1,13 +1,14 @@
-import React, { createContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import { localhost, backendUrl } from '../services/api';
-import { Alert } from 'react-native';
+import React, { createContext, useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { localhost, backendUrl } from "../services/api";
+import { Alert } from "react-native";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [userToken, setUserToken] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
+  const [refreshToken, setRefreshToken] = useState(null);
   const [isLoading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState(null);
   const [isGuest, setIsGuest] = useState(false);
@@ -16,27 +17,29 @@ export const AuthProvider = ({ children }) => {
   const updateUserInfoState = async (updatedUserData) => {
     try {
       if (!updatedUserData) {
-        console.log('No data provided to update user info');
+        console.log("No data provided to update user info");
         return;
       }
-      
-      // If nothing changed, don't update state or storage
-      if (userInfo && 
-          userInfo.username === updatedUserData.username && 
-          userInfo.email === updatedUserData.email) {
-        console.log('User info unchanged, skipping update');
+
+      if (
+        userInfo &&
+        userInfo.username === updatedUserData.username &&
+        userInfo.email === updatedUserData.email
+      ) {
+        console.log("User info unchanged, skipping update");
         return;
       }
-      
-      // If we have existing user info, merge with new data
-      const updatedInfo = userInfo ? {
-        ...userInfo,
-        ...updatedUserData
-      } : updatedUserData;
-      
+
+      const updatedInfo = userInfo
+        ? {
+            ...userInfo,
+            ...updatedUserData,
+          }
+        : updatedUserData;
+
       setUserInfo(updatedInfo);
-      await AsyncStorage.setItem('userInfo', JSON.stringify(updatedInfo));
-      console.log('User info updated in context and storage');
+      await AsyncStorage.setItem("userInfo", JSON.stringify(updatedInfo));
+      console.log("User info updated in context and storage");
     } catch (e) {
       console.log(`Error updating user info in context: ${e}`);
     }
@@ -52,28 +55,39 @@ export const AuthProvider = ({ children }) => {
   // Function to enable guest mode
   const enableGuestMode = () => {
     console.log("Enabling Guest mode");
-    setUserToken(null); // Ensure no token
+    setAccessToken(null);
+    setRefreshToken(null);
     setUserInfo(null);
     setIsGuest(true);
   };
 
-  const signup = async (username, email, password, role) => {
+  const signup = async (username, email, password) => {
     setLoading(true);
     try {
-      const res = await axios.post(`${backendUrl}/auth/signup`, { username, email, password });
-      console.log('Signup response:', res.data);
-      
+      const res = await axios.post(`${backendUrl}/auth/signup`, {
+        username,
+        email,
+        password,
+      });
+      console.log("Signup response:", res.data);
+
       if (res.data.user) {
-        // Sign in automatically after successful signup
-        signin(email, password);
+        // Store tokens and user info
+        await storeTokens(res.data.accessToken, res.data.refreshToken);
+        setUserInfo(res.data.user);
+        await AsyncStorage.setItem("userInfo", JSON.stringify(res.data.user));
       } else {
-        Alert.alert("Signup Success", res.data.message || "Account created successfully!");
+        Alert.alert(
+          "Signup Success",
+          res.data.message || "Account created successfully!"
+        );
       }
     } catch (e) {
       console.log(`sign up error:`, e.response?.data || e.message);
       Alert.alert(
-        "Signup Failed", 
-        e.response?.data?.message || "Something went wrong. Please check your information and try again."
+        "Signup Failed",
+        e.response?.data?.message ||
+          "Something went wrong. Please check your information and try again."
       );
     } finally {
       setLoading(false);
@@ -84,40 +98,40 @@ export const AuthProvider = ({ children }) => {
   const signin = async (email, password) => {
     setLoading(true);
     try {
-      console.log('Attempting to sign in with URL:', `${backendUrl}/auth/signin`);
-      
+      console.log(
+        "Attempting to sign in with URL:",
+        `${backendUrl}/auth/signin`
+      );
+
       // Add timeout to prevent hanging indefinitely
-      const res = await axios.post(`${backendUrl}/auth/signin`, 
+      const res = await axios.post(
+        `${backendUrl}/auth/signin`,
         { email, password },
-        { 
+        {
           timeout: 10000, // 10 seconds timeout
-          headers: { 'Content-Type': 'application/json' }
+          headers: { "Content-Type": "application/json" },
         }
       );
-      
-      console.log('Signin response:', res.data);
-      
-      const userData = {
-        ...res.data.user,
-        token: res.data.accessToken
-      };
-      
-      setUserInfo(userData);
-      await AsyncStorage.setItem('userInfo', JSON.stringify(userData));
-      setUserToken(res.data.accessToken);
-      await AsyncStorage.setItem('userToken', res.data.accessToken);
+
+      console.log("Signin response:", res.data);
+
+      // Store tokens and user info
+      await storeTokens(res.data.accessToken, res.data.refreshToken);
+      setUserInfo(res.data.user);
+      await AsyncStorage.setItem("userInfo", JSON.stringify(res.data.user));
     } catch (e) {
-      console.log(`Sign in error URL:`, backendUrl);
-      console.log(`Sign in error details:`, e);
-      console.log(`Sign in error message:`, e.message);
-      console.log(`Sign in error code:`, e.code);
-      
-      if (e.code === 'ECONNABORTED') {
-        Alert.alert("Connection Timeout", "Could not connect to the server. Please check your network connection and try again.");
+      console.log(`Sign in error:`, e);
+
+      if (e.code === "ECONNABORTED") {
+        Alert.alert(
+          "Connection Timeout",
+          "Could not connect to the server. Please check your network connection and try again."
+        );
       } else {
         Alert.alert(
-          "Sign in Failed", 
-          e.response?.data?.message || "Invalid email or password. Please try again."
+          "Sign in Failed",
+          e.response?.data?.message ||
+            "Invalid email or password. Please try again."
         );
       }
     } finally {
@@ -129,85 +143,137 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     console.log("Logout function called");
     setLoading(true);
-    
+
     try {
-      // First make sure we clear the state
-      setUserToken(null);
+      // Clear state
+      setAccessToken(null);
+      setRefreshToken(null);
       setUserInfo(null);
-      
-      // Then ensure we clear storage
-      await AsyncStorage.removeItem('userInfo');
-      await AsyncStorage.removeItem('userToken');
-      
-      // Then try to call the backend, but it's okay if this fails
+
+      // Clear storage
+      await AsyncStorage.removeItem("userInfo");
+      await AsyncStorage.removeItem("accessToken");
+      await AsyncStorage.removeItem("refreshToken");
+
+      // Call backend logout
       try {
-        const response = await axios.post(`${backendUrl}/auth/signout`);
-        console.log('Logout API response:', response.data);
+        await axios.post(`${backendUrl}/auth/signout`);
       } catch (apiError) {
-        console.log('Logout API error (non-critical):', apiError.message);
+        console.log("Logout API error (non-critical):", apiError.message);
       }
-      
-      console.log('Logout successful - User token cleared');
     } catch (e) {
       console.log(`Logout error:`, e.message);
-      
-      // If there's any error, make another attempt to clear storage
-      try {
-        setUserToken(null);
-        setUserInfo(null);
-        await AsyncStorage.removeItem('userInfo');
-        await AsyncStorage.removeItem('userToken');
-      } catch (finalError) {
-        console.log('Final attempt to clear storage failed:', finalError.message);
-      }
+      // Final attempt to clear everything
+      setAccessToken(null);
+      setRefreshToken(null);
+      setUserInfo(null);
+      await AsyncStorage.removeItem("userInfo");
+      await AsyncStorage.removeItem("accessToken");
+      await AsyncStorage.removeItem("refreshToken");
     } finally {
       setLoading(false);
     }
-
     setIsGuest(false);
   };
 
-  // Setup axios interceptor for authenticated requests
+  // Helper function to store tokens
+  const storeTokens = async (access, refresh) => {
+    setAccessToken(access);
+    setRefreshToken(refresh);
+    await AsyncStorage.setItem("accessToken", access);
+    await AsyncStorage.setItem("refreshToken", refresh);
+  };
+
+  // Setup axios interceptor for token refresh
   useEffect(() => {
-    const setupAxiosInterceptor = () => {
-      axios.interceptors.request.use(
-        (config) => {
-          if (userToken) {
-            config.headers['x-access-token'] = userToken;
-          }
-          return config;
-        },
-        (error) => {
-          return Promise.reject(error);
+    const interceptor = axios.interceptors.response.use(
+      (response) => {
+        // Check for new access token in response header
+        const newAccessToken = response.headers["x-new-access-token"];
+        if (newAccessToken) {
+          setAccessToken(newAccessToken);
+          AsyncStorage.setItem("accessToken", newAccessToken);
         }
-      );
+        return response;
+      },
+      async (error) => {
+        const originalRequest = error.config;
+
+        // If error is 401 and we haven't retried yet
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          try {
+            // Retry the original request with new access token
+            const newAccessToken = error.response.headers["x-new-access-token"];
+            if (newAccessToken) {
+              originalRequest.headers["x-access-token"] = newAccessToken;
+              setAccessToken(newAccessToken);
+              await AsyncStorage.setItem("accessToken", newAccessToken);
+              return axios(originalRequest);
+            }
+          } catch (refreshError) {
+            console.log("Token refresh failed:", refreshError);
+            // If refresh fails, logout user
+            await logout();
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
     };
+  }, []);
 
-    setupAxiosInterceptor();
-  }, [userToken]);
+  // Setup request interceptor
+  useEffect(() => {
+    const requestInterceptor = axios.interceptors.request.use(
+      (config) => {
+        if (accessToken) {
+          config.headers["x-access-token"] = accessToken;
+        }
+        if (refreshToken) {
+          config.headers["x-refresh-token"] = refreshToken;
+        }
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
 
-  // Check storage on mount
+    return () => {
+      axios.interceptors.request.eject(requestInterceptor);
+    };
+  }, [accessToken, refreshToken]);
+
+  // Load initial state from storage
   useEffect(() => {
     const loadInitialState = async () => {
       setLoading(true);
       try {
-        const storedToken = await AsyncStorage.getItem('userToken');
-        const storedUserInfo = await AsyncStorage.getItem('userInfo');
-        
-        if (storedToken && storedUserInfo) {
-          const parsedUserInfo = JSON.parse(storedUserInfo);
-          setUserToken(storedToken);
-          setUserInfo(parsedUserInfo);
-          setIsGuest(false); // If token exists, not a guest
-          console.log('User session loaded from storage');
+        const [storedAccessToken, storedRefreshToken, storedUserInfo] =
+          await Promise.all([
+            AsyncStorage.getItem("accessToken"),
+            AsyncStorage.getItem("refreshToken"),
+            AsyncStorage.getItem("userInfo"),
+          ]);
+
+        if (storedAccessToken && storedRefreshToken && storedUserInfo) {
+          setAccessToken(storedAccessToken);
+          setRefreshToken(storedRefreshToken);
+          setUserInfo(JSON.parse(storedUserInfo));
+          setIsGuest(false);
+          console.log("User session loaded from storage");
         } else {
-          // No token found, could be first launch or logged out
-          setIsGuest(false); // Default to auth flow unless explicitly entering guest mode
+          setIsGuest(false);
         }
       } catch (e) {
         console.log(`load user data error: ${e}`);
-        // Ensure clean state on error
-        setUserToken(null);
+        setAccessToken(null);
+        setRefreshToken(null);
         setUserInfo(null);
         setIsGuest(false);
       } finally {
@@ -217,24 +283,22 @@ export const AuthProvider = ({ children }) => {
     loadInitialState();
   }, []);
 
-  // Log state changes for debugging
-  useEffect(() => {
-     console.log('Auth state changed - userToken:', userToken ? 'exists' : 'null', 'isGuest:', isGuest, 'isLoading:', isLoading);
-  }, [userToken, isGuest, isLoading]);
-
   return (
-    <AuthContext.Provider value={{ 
-      signin, 
-      signup, 
-      logout, 
-      updateUserInfoState,
-      switchToAuthFlow, 
-      enableGuestMode,  // Provide function to enter guest mode
-      isLoading, 
-      userInfo, 
-      userToken,
-      isGuest          // Provide guest status
-    }}>
+    <AuthContext.Provider
+      value={{
+        signin,
+        signup,
+        logout,
+        updateUserInfoState,
+        switchToAuthFlow,
+        enableGuestMode,
+        isLoading,
+        userInfo,
+        accessToken,
+        refreshToken,
+        isGuest,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
