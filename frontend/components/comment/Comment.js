@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import { FontFamily, FontSize } from "../../GlobalStyles";
@@ -30,33 +31,49 @@ const Comment = ({
   const navigation = useNavigation();
   const [isLoading, setLoading] = useState(false);
   const [openInput, setOpenInput] = useState(false);
-  const [input, setInput] = useState(null);
+  const [input, setInput] = useState("");
   const { userInfo } = useContext(AuthContext);
   const { colors } = useTheme();
 
-  if (type !== "artwork" && type !== "exhibition") {
-    return null;
-  }
+  // if (type !== "artwork" && type !== "exhibition") {
+  //   return null;
+  // }
 
   const createComments = async () => {
+    if (!input.trim()) return; // Don't submit empty comments
+
     setLoading(true);
-    if (userInfo != null)
+    if (userInfo != null) {
       try {
         const response = await axios.post(
           `${backendUrl}/${type}/${id}/comments`,
           {
             content: input,
-          },
-          { headers: { Authorization: `${userInfo.token}` } }
+          }
         );
-        setComments([...comments, response.data]);
+
+        if (response.data && response.data.User) {
+          setComments([...comments, response.data]);
+        } else if (response.data && response.data.message) {
+          await refreshComments();
+        } else {
+          console.error("Invalid response format:", response.data);
+          Alert.alert("Error", "Failed to create comment. Please try again.");
+        }
+
+        setInput(""); // Clear input after successful submission
         setOpenInput(false);
-        setLoading(false);
       } catch (error) {
-        console.error(error);
+        console.error("Error creating comment:", error);
+        Alert.alert(
+          "Error",
+          error.response?.data?.message ||
+            "Failed to create comment. Please try again."
+        );
       } finally {
         setLoading(false);
       }
+    }
   };
 
   const handleComment = () => {
@@ -77,9 +94,10 @@ const Comment = ({
     return (
       <CommentFrame
         key={item.id}
-        id={item.userId}
-        date={item.updatedAt.slice(0, 10)}
-        text={item.comment}
+        id={item.id}
+        username={item.User.username || "Unknown User"}
+        date={item.created_at ? item.created_at.slice(0, 10) : ""}
+        text={item.content}
       />
     );
   };
