@@ -42,7 +42,8 @@ const BoardExtraInfo = ({ date, id, type }) => {
 
       if (userInfo) {
         const checkReaction = await axios.get(
-          `${backendUrl}/${type}/${id}/check-reaction`
+          `${backendUrl}/${type}/${id}/check-reaction`,
+          { headers: { Authorization: `${userInfo.token}` } }
         );
         setIsLiked(checkReaction.data.hasReacted);
       }
@@ -65,13 +66,17 @@ const BoardExtraInfo = ({ date, id, type }) => {
       navigation.navigate("Login");
       return;
     }
-
+    console.log(userInfo);
     try {
       if (isLiked) {
-        await axios.delete(`${backendUrl}/${type}/${id}/reactions`);
+        await axios.delete(`${backendUrl}/${type}/${id}/reactions`, {
+          headers: { Authorization: `${userInfo.token}` },
+        });
         setLikeAmount((prev) => prev - 1);
       } else {
-        await axios.post(`${backendUrl}/${type}/${id}/reactions`);
+        await axios.post(`${backendUrl}/${type}/${id}/reactions`, {
+          headers: { Authorization: `${userInfo.token}` },
+        });
         setLikeAmount((prev) => prev + 1);
       }
       setIsLiked(!isLiked);
@@ -145,11 +150,7 @@ const BoardExtraInfo = ({ date, id, type }) => {
             <Image
               style={[styles.frameChild, isLiked && styles.likedIcon]}
               contentFit="cover"
-              source={
-                isLiked
-                  ? require("../../../assets/heart-filled.png")
-                  : require("../../../assets/group-192.png")
-              }
+              source={require("../../../assets/group-192.png")}
             />
             <Text
               style={[

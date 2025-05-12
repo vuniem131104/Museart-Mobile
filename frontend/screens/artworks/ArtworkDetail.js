@@ -6,7 +6,7 @@ import {
   View,
   Dimensions,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Color, FontFamily, FontSize, Padding } from "../../GlobalStyles";
 import { useRoute, useTheme } from "@react-navigation/native";
 import axios from "axios";
@@ -27,7 +27,7 @@ const ArtworkDetail = () => {
   const { userInfo } = useContext(AuthContext);
 
   const { colors } = useTheme();
-  const [artwork, setArtwork] = useState([]);
+  const [artwork, setArtwork] = useState({});
   const [isLoading, setLoading] = useState(true);
 
   const getArtwork = async () => {
@@ -35,16 +35,18 @@ const ArtworkDetail = () => {
       console.log(`${baseUrl}/api/v1/artworks/${ID}`);
       const response = await axios.get(`${baseUrl}/artworks/${ID}`);
       setArtwork(response.data.data);
+      console.log(artwork);
       console.log(response.data.data.description);
     } catch (error) {
       //console.log(artwork);
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     getArtwork();
-    setLoading(false);
   }, []);
 
   return (

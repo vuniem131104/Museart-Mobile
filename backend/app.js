@@ -23,8 +23,8 @@ app.use(express.urlencoded({ extended: true }));
 // Thiết lập các routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
-app.use("/api/exhibitions", exhibitionRoutes);
-app.use("/api/artworks", artworkRoutes);
+app.use("/api/exhibition", exhibitionRoutes);
+app.use("/api/artwork", artworkRoutes);
 
 // Route mặc định
 app.get("/", (req, res) => {

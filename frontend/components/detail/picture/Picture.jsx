@@ -15,9 +15,9 @@ import { Border, Color, FontSize, Padding } from "../../../GlobalStyles";
 const Picture = ({ imagePath, date, altText, id, type }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
-  if (type !== "artwork" && type !== "exhibition") {
-    return null;
-  }
+  // if (type !== "artwork" && type !== "exhibition") {
+  //   return null;
+  // }
 
   return (
     <ImageBackground
