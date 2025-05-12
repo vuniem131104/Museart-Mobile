@@ -4,13 +4,14 @@ const {
   ExhibitionComment,
   User,
 } = require("../models/models");
+const sequelize = require("../models/config.models");
 
 // Like/Unlike exhibition
 const toggleReaction = async (req, res) => {
   try {
     const { exhibitionId } = req.params;
-    const userId = req.user.id;
-    const { type } = req.body;
+    const userId = req.userId;
+    const { type } = req.body || "like";
 
     const existingReaction = await ExhibitionReaction.findOne({
       where: {
@@ -33,6 +34,7 @@ const toggleReaction = async (req, res) => {
     }
 
     // Create new reaction
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
     await ExhibitionReaction.create({
       user_id: userId,
       exhibition_id: exhibitionId,
@@ -51,16 +53,24 @@ const toggleReaction = async (req, res) => {
 const getReactions = async (req, res) => {
   try {
     const { exhibitionId } = req.params;
-    const reactions = await ExhibitionReaction.findAll({
+    const reactions = await ExhibitionReaction.count({
       where: { exhibition_id: exhibitionId },
-      include: [
-        {
-          model: User,
-          attributes: ["id", "username"],
-        },
-      ],
     });
-    res.json(reactions);
+    res.json({ count: reactions });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const checkUserReaction = async (req, res) => {
+  try {
+    const { exhibitionId } = req.params;
+    const userId = req.userId;
+    const reaction = await ExhibitionReaction.findOne({
+      where: { exhibition_id: exhibitionId, user_id: userId },
+    });
+    res.json({ hasReacted: reaction !== null });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -71,9 +81,10 @@ const getReactions = async (req, res) => {
 const addComment = async (req, res) => {
   try {
     const { exhibitionId } = req.params;
-    const userId = req.user.id;
+    const userId = req.userId;
     const { content } = req.body;
 
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
     const comment = await ExhibitionComment.create({
       user_id: userId,
       exhibition_id: exhibitionId,
@@ -81,18 +92,7 @@ const addComment = async (req, res) => {
       created_at: new Date(),
     });
 
-    // Fetch the created comment with user details
-    const commentWithUser = await ExhibitionComment.findOne({
-      where: { id: comment.id },
-      include: [
-        {
-          model: User,
-          attributes: ["id", "username"],
-        },
-      ],
-    });
-
-    res.json(commentWithUser);
+    res.json({ message: "Comment added successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -105,10 +105,11 @@ const getComments = async (req, res) => {
     const { exhibitionId } = req.params;
     const comments = await ExhibitionComment.findAll({
       where: { exhibition_id: exhibitionId },
+      attributes: ["id", "content", "created_at"],
       include: [
         {
           model: User,
-          attributes: ["id", "username"],
+          attributes: ["username"],
         },
       ],
       order: [["created_at", "DESC"]],
@@ -124,7 +125,7 @@ const getComments = async (req, res) => {
 const deleteComment = async (req, res) => {
   try {
     const { commentId } = req.params;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     const comment = await ExhibitionComment.findOne({
       where: { id: commentId },
@@ -152,6 +153,7 @@ const deleteComment = async (req, res) => {
 module.exports = {
   toggleReaction,
   getReactions,
+  checkUserReaction,
   addComment,
   getComments,
   deleteComment,

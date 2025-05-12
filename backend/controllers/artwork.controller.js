@@ -4,13 +4,14 @@ const {
   ArtworkComment,
   User,
 } = require("../models/models");
+const sequelize = require("../models/config.models");
 
 // Like/Unlike artwork
 const toggleReaction = async (req, res) => {
   try {
     const { artworkId } = req.params;
-    const userId = req.user.id; // Assuming you have authentication middleware
-    const { type } = req.body;
+    const userId = req.userId; // Assuming you have authentication middleware
+    const { type } = req.body || "like";
 
     const existingReaction = await ArtworkReaction.findOne({
       where: {
@@ -33,12 +34,14 @@ const toggleReaction = async (req, res) => {
     }
 
     // Create new reaction
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
     await ArtworkReaction.create({
       user_id: userId,
       artwork_id: artworkId,
       type,
       created_at: new Date(),
     });
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 1");
 
     res.json({ message: "Reaction added successfully" });
   } catch (error) {
@@ -65,7 +68,7 @@ const getReactions = async (req, res) => {
 const checkUserReaction = async (req, res) => {
   try {
     const { artworkId } = req.params;
-    const userId = req.user.id;
+    const userId = req.userId;
     const reaction = await ArtworkReaction.findOne({
       where: { artwork_id: artworkId, user_id: userId },
     });
@@ -80,28 +83,19 @@ const checkUserReaction = async (req, res) => {
 const addComment = async (req, res) => {
   try {
     const { artworkId } = req.params;
-    const userId = req.user.id;
+    const userId = req.userId;
     const { content } = req.body;
 
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
     const comment = await ArtworkComment.create({
       user_id: userId,
       artwork_id: artworkId,
       content,
       created_at: new Date(),
     });
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 1");
 
-    // Fetch the created comment with user details
-    const commentWithUser = await ArtworkComment.findOne({
-      where: { id: comment.id },
-      include: [
-        {
-          model: User,
-          attributes: ["id", "username"],
-        },
-      ],
-    });
-
-    res.json(commentWithUser);
+    res.json({ message: "Comment added successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -114,10 +108,11 @@ const getComments = async (req, res) => {
     const { artworkId } = req.params;
     const comments = await ArtworkComment.findAll({
       where: { artwork_id: artworkId },
+      attributes: ["id", "content", "created_at"],
       include: [
         {
           model: User,
-          attributes: ["id", "username"],
+          attributes: ["username"],
         },
       ],
       order: [["created_at", "DESC"]],
@@ -133,7 +128,7 @@ const getComments = async (req, res) => {
 const deleteComment = async (req, res) => {
   try {
     const { commentId } = req.params;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     const comment = await ArtworkComment.findOne({
       where: { id: commentId },
