@@ -37,13 +37,12 @@ const BoardExtraInfo = ({ date, id, type }) => {
   const getReactions = async () => {
     try {
       const response = await axios.get(`${backendUrl}/${type}/${id}/reactions`);
-      const reactions = response.data;
-      setLikeAmount(reactions.length);
+      const reactions = response.data.count;
+      setLikeAmount(reactions);
 
       if (userInfo) {
         const checkReaction = await axios.get(
-          `${backendUrl}/${type}/${id}/check-reaction`,
-          { headers: { Authorization: `${userInfo.token}` } }
+          `${backendUrl}/${type}/${id}/check-reaction`
         );
         setIsLiked(checkReaction.data.hasReacted);
       }
@@ -72,16 +71,12 @@ const BoardExtraInfo = ({ date, id, type }) => {
     setLikeAmount((prev) => isLiked ? prev - 1 : prev + 1);
 
     try {
-      if (isLiked) {
-        await axios.delete(`${backendUrl}/${type}/${id}/reactions`, {
-        });
-      } else {
-        await axios.post(`${backendUrl}/${type}/${id}/reactions`, {
-        });
-      }
+      await axios.post(`${backendUrl}/${type}/${id}/reactions`, {
+        type: "like",
+      });
     } catch (error) {
       console.error("Error handling like:", error);
-      setIsLiked(isLiked);
+      setIsLiked(!isLiked);
       setLikeAmount((prev) => isLiked ? prev + 1 : prev - 1);
     }
   };
@@ -135,6 +130,7 @@ const BoardExtraInfo = ({ date, id, type }) => {
                 setComments={setComments}
                 onCommentAdded={handleCommentAdded}
                 refreshComments={getComments}
+                type={type}
               />
             </View>
           </Modal>
