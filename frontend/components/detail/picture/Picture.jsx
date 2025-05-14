@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   Modal,
   Pressable,
+  View,
 } from "react-native";
 import { Image } from "expo-image";
 import BoardExtraInfo from "./BoardExtraInfo";
@@ -20,46 +21,57 @@ const Picture = ({ imagePath, date, altText, id, type }) => {
   // }
 
   return (
-    <ImageBackground
-      source={{ uri: imagePath }}
-      resizeMode="cover"
-      style={styles.picture}
-      alt={altText}
-    >
-      <BoardExtraInfo date={date} id={id} type={type} />
-      <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
-        <Image
-          style={styles.fullscreenpictureicon}
-          contentFit="cover"
-          source={require("../../../assets/fullscreenpictureicon.png")}
-        />
-      </TouchableWithoutFeedback>
-      <Modal
-        visible={modalVisible}
-        animationType="fade"
-        transparent={true}
-        style={{ flex: 1 }}
+    <View style={styles.container}>
+      <ImageBackground
+        source={{ uri: imagePath }}
+        resizeMode="cover"
+        style={styles.picture}
+        alt={altText}
       >
-        <Pressable
-          style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.85)" }}
-          onPress={() => setModalVisible(false)}
-        >
-          <ImageBackground
-            style={{ flex: 1 }}
-            source={{ uri: imagePath }}
-            resizeMode="contain"
-            accessibilityLabel={altText}
+        <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
+          <Image
+            style={styles.fullscreenpictureicon}
+            contentFit="cover"
+            source={require("../../../assets/fullscreenpictureicon.png")}
           />
-        </Pressable>
-      </Modal>
-    </ImageBackground>
+        </TouchableWithoutFeedback>
+        <Modal
+          visible={modalVisible}
+          animationType="fade"
+          transparent={true}
+          style={{ flex: 1 }}
+        >
+          <Pressable
+            style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+            onPress={() => setModalVisible(false)}
+          >
+            <ImageBackground
+              style={{ flex: 1 }}
+              source={{ uri: imagePath }}
+              resizeMode="contain"
+              accessibilityLabel={altText}
+            />
+          </Pressable>
+        </Modal>
+      </ImageBackground>
+      {/* Info section moved below the image */}
+      {(type === "artwork" || type === "exhibition") && (
+        <BoardExtraInfo date={date} id={id} type={type} />
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    alignSelf: "stretch",
+    borderRadius: Border.br_xl,
+    overflow: "hidden",
+  },
   fullscreenpictureicon: {
     position: "absolute",
     top: 20,
+    right: 20,
     width: 20,
     height: 20,
     zIndex: 1,
@@ -70,8 +82,8 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorMediumseagreen_100,
     height: Dimensions.get("screen").width,
     overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "flex-end",
+    alignItems: "flex-end",
+    justifyContent: "flex-start",
     padding: Padding.p_3xs,
   },
   textX: {

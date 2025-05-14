@@ -104,21 +104,23 @@ const BoardExtraInfo = ({ date, id, type }) => {
   return (
     <View style={[styles.boardExtraInfoArtwork]}>
       <View style={styles.frameParent}>
-        <TouchableOpacity
-          style={styles.commentParent}
-          onPress={() => setModalVisible(true)}
-        >
+        <View style={styles.commentParent}>
           <Text style={[styles.comment, styles.textTypo]}>Comment</Text>
-          <View style={styles.groupParent}>
-            <Image
-              style={styles.frameChild}
-              contentFit="cover"
-              source={require("../../../assets/group-17.png")}
-            />
+          <TouchableOpacity
+            style={styles.iconContainer}
+            onPress={() => setModalVisible(true)}
+          >
+            <View style={styles.iconWrapper}>
+              <Image
+                style={styles.frameChild}
+                contentFit="cover"
+                source={require("../../../assets/group-17.png")}
+              />
+            </View>
             <Text style={[styles.text, styles.textTypo]}>
               {comments.length}
             </Text>
-          </View>
+          </TouchableOpacity>
           <Modal
             visible={modalVisible}
             animationType="slide"
@@ -136,21 +138,23 @@ const BoardExtraInfo = ({ date, id, type }) => {
               />
             </View>
           </Modal>
-        </TouchableOpacity>
+        </View>
 
         <View style={styles.commentParent}>
           <Text style={[styles.comment, styles.textTypo]}>
             {isLiked ? "Liked" : "Like"}
           </Text>
           <TouchableOpacity
-            style={[styles.groupParent, isLiked && styles.likedContainer]}
+            style={styles.iconContainer}
             onPress={handleLike}
           >
-            <Image
-              style={[styles.frameChild, isLiked && styles.likedIcon]}
-              contentFit="cover"
-              source={require("../../../assets/group-192.png")}
-            />
+            <View style={[styles.iconWrapper, isLiked && styles.likedIconWrapper]}>
+              <Image
+                style={[styles.frameChild, isLiked && styles.likedIcon]}
+                contentFit="cover"
+                source={require("../../../assets/group-192.png")}
+              />
+            </View>
             <Text
               style={[
                 styles.text,
@@ -164,18 +168,18 @@ const BoardExtraInfo = ({ date, id, type }) => {
         </View>
 
         <View style={styles.commentParent}>
-          <View style={styles.commentParent}>
-            <Text style={[styles.comment, styles.textTypo]}>Last Updated</Text>
-            <View style={styles.groupParent}>
+          <Text style={[styles.comment, styles.textTypo]}>Last Updated</Text>
+          <View style={styles.iconContainer}>
+            <View style={styles.iconWrapper}>
               <Image
                 style={styles.frameChild}
                 contentFit="cover"
                 source={require("../../../assets/group-15.png")}
               />
-              <Text style={[styles.text, styles.textTypo]}>
-                {date != null ? date.slice(0, 10) : ""}
-              </Text>
             </View>
+            <Text style={[styles.text, styles.textTypo]}>
+              {date != null ? date.slice(0, 10) : ""}
+            </Text>
           </View>
         </View>
       </View>
@@ -186,7 +190,7 @@ const BoardExtraInfo = ({ date, id, type }) => {
 const styles = StyleSheet.create({
   textTypo: {
     textAlign: "left",
-    color: Color.primaryPrimaryFixed,
+    color: Color.colorWhite, // White text for better contrast on dark background
     fontSize: FontSize.labelLargeBold_size,
   },
   comment: {
@@ -200,19 +204,33 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontFamily: FontFamily.labelLargeMedium,
     marginLeft: 10,
+    minWidth: 30, // Ensure consistent width for numbers
   },
-  groupParent: {
+  iconContainer: {
     marginTop: 10,
     flexDirection: "row",
     alignItems: "center",
+    height: 40, // Fixed height for all icon containers
+  },
+  iconWrapper: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: Border.br_3xs,
+  },
+  likedIconWrapper: {
+    backgroundColor: Color.primaryPrimary + "40",
   },
   commentParent: {
     alignItems: "center",
+    width: "30%", // Ensure equal width for all three columns
   },
   frameParent: {
     alignSelf: "stretch",
     justifyContent: "space-between",
     flexDirection: "row",
+    width: "100%",
   },
   boardExtraInfoArtwork: {
     shadowColor: "rgba(0, 0, 0, 0.25)",
@@ -223,13 +241,14 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
     shadowOpacity: 1,
-    borderRadius: Border.br_6xl,
-    backgroundColor: Color.colorGray_400,
+    borderRadius: Border.br_3xs,
+    backgroundColor: Color.colorGray_300, // Darker background for better contrast
     overflow: "hidden",
-    paddingHorizontal: Padding.p_3xs,
+    paddingHorizontal: Padding.p_xl,
     paddingVertical: Padding.p_mini,
     alignItems: "center",
     alignSelf: "stretch",
+    marginTop: 2, // Add a small gap between image and info box
   },
   loadingContainer: {
     justifyContent: "center",
@@ -240,16 +259,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-  likedContainer: {
-    backgroundColor: Color.primaryPrimaryFixed + "20",
-    borderRadius: Border.br_3xs,
-    padding: Padding.p_3xs,
-  },
+  // Removed likedContainer as we're now using likedIconWrapper
   likedIcon: {
-    tintColor: Color.primaryPrimaryFixed,
+    tintColor: Color.primaryPrimary, // Match the liked text color
   },
   likedText: {
-    color: Color.primaryPrimaryFixed,
+    color: Color.primaryPrimary, // Use primary color for liked state
   },
 });
 

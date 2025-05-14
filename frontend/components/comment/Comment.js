@@ -109,9 +109,13 @@ const Comment = ({
         { backgroundColor: colors.surfaceContainerHigh },
       ]}
     >
-      <View style={styles.frameGroupFlexBox}>
-        <TouchableOpacity onPress={modalVisible}>
-          <Svg width={25} height={25} viewBox="0 0 25 25" fill="none">
+      <View style={[styles.headerContainer, { backgroundColor: colors.surfaceContainerHighest }]}>
+        <TouchableOpacity
+          style={styles.headerButton}
+          onPress={modalVisible}
+          activeOpacity={0.7}
+        >
+          <Svg width={22} height={22} viewBox="0 0 25 25" fill="none">
             <Path
               d="M2.9887 5.96607C2.44266 5.42003 2.44265 4.53473 2.98869 3.98869C3.53473 3.44265 4.42003 3.44265 4.96607 3.98868L21.0113 20.0338C21.5573 20.5799 21.5573 21.4652 21.0113 22.0112C20.4653 22.5572 19.58 22.5572 19.0339 22.0112L2.9887 5.96607Z"
               fill={colors.onSurface}
@@ -123,74 +127,56 @@ const Comment = ({
           </Svg>
         </TouchableOpacity>
         <Text style={[styles.commentTypo, { color: colors.onSurface }]}>
-          Comment
+          Comments
         </Text>
-        <TouchableOpacity onPress={handleComment}>
-          <Svg width={25} height={25} viewBox="0 0 25 25" fill="none">
-            <Path
-              d="M18.75 2.08337H6.25C5.4212 2.08337 4.62634 2.41261 4.04029 2.99867C3.45424 3.58472 3.125 4.37957 3.125 5.20837V16.6667C3.125 17.4955 3.45424 18.2904 4.04029 18.8764C4.62634 19.4625 5.4212 19.7917 6.25 19.7917H8.94792L11.7604 22.6146C11.8577 22.7112 11.9732 22.7875 12.1001 22.8394C12.227 22.8912 12.3629 22.9175 12.5 22.9167C12.7483 22.9167 12.9884 22.8281 13.1771 22.6667L16.5312 19.7917H18.75C19.5788 19.7917 20.3737 19.4625 20.9597 18.8764C21.5458 18.2904 21.875 17.4955 21.875 16.6667V5.20837C21.875 4.37957 21.5458 3.58472 20.9597 2.99867C20.3737 2.41261 19.5788 2.08337 18.75 2.08337ZM19.7917 16.6667C19.7917 16.943 19.6819 17.2079 19.4866 17.4033C19.2912 17.5986 19.0263 17.7084 18.75 17.7084H16.1458C15.8976 17.7084 15.6574 17.797 15.4688 17.9584L12.5521 20.4584L10.1146 18.0105C10.0172 17.9139 9.90182 17.8375 9.7749 17.7857C9.64799 17.7339 9.51209 17.7076 9.375 17.7084H6.25C5.97373 17.7084 5.70878 17.5986 5.51343 17.4033C5.31808 17.2079 5.20833 16.943 5.20833 16.6667V5.20837C5.20833 4.93211 5.31808 4.66716 5.51343 4.4718C5.70878 4.27645 5.97373 4.16671 6.25 4.16671H18.75C19.0263 4.16671 19.2912 4.27645 19.4866 4.4718C19.6819 4.66716 19.7917 4.93211 19.7917 5.20837V16.6667Z"
-              fill={colors.onSurface}
-            />
-          </Svg>
-        </TouchableOpacity>
+        <View style={styles.commentCountContainer}>
+          <Text style={[styles.commentCount, { color: colors.onSurface }]}>
+            {comments.length}
+          </Text>
+        </View>
       </View>
       <Modal visible={openInput} transparent={true}>
         <TouchableOpacity
           onPressOut={() => {
             setOpenInput(false);
           }}
-          style={{
-            justifyContent: "center",
-            alignSelf: "center",
-            alignItems: "center",
-            flex: 1,
-          }}
+          style={styles.modalOverlay}
         >
-          <View
-            style={{
-              backgroundColor: colors.surface,
-              padding: 10,
-              borderRadius: 15,
-              flexDirection: "row",
-              alignSelf: "stretch",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 5,
-            }}
-          >
-            <View style={{ width: 25, height: 25 }} />
+          <View style={[styles.commentInputContainer, { backgroundColor: colors.surfaceContainerHighest }]}>
             <TextInput
-              placeholderTextColor={colors.onSurface}
-              style={{
-                height: 40,
-                borderColor: "gray",
-                color: colors.onSurfaceVarient,
-                borderWidth: 1,
-                padding: 5,
-              }}
+              placeholderTextColor="rgba(128, 128, 128, 0.7)"
+              style={[styles.commentInput, {
+                color: colors.onSurface,
+                borderColor: 'rgba(128, 128, 128, 0.3)',
+              }]}
               placeholder="Write your comment here"
               onChangeText={(text) => {
                 setInput(text);
               }}
+              multiline={true}
+              numberOfLines={1}
+              maxLength={500}
+              value={input}
             />
             <TouchableOpacity
-              style={{ color: colors.onSurfaceVarient }}
+              style={[styles.sendButton, { backgroundColor: colors.primary }]}
               onPress={() => {
                 createComments();
               }}
+              activeOpacity={0.7}
             >
-              <Svg
-                width={25}
-                height={25}
-                viewBox="0 -0.5 25 25"
-                fill={colors.primary}
-              >
+              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
                 <Path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M18.455 9.8834L7.063 4.1434C6.76535 3.96928 6.40109 3.95274 6.08888 4.09916C5.77667 4.24558 5.55647 4.53621 5.5 4.8764C5.5039 4.98942 5.53114 5.10041 5.58 5.2024L7.749 10.4424C7.85786 10.7903 7.91711 11.1519 7.925 11.5164C7.91714 11.8809 7.85789 12.2425 7.749 12.5904L5.58 17.8304C5.53114 17.9324 5.5039 18.0434 5.5 18.1564C5.55687 18.4961 5.77703 18.7862 6.0889 18.9323C6.40078 19.0785 6.76456 19.062 7.062 18.8884L18.455 13.1484C19.0903 12.8533 19.4967 12.2164 19.4967 11.5159C19.4967 10.8154 19.0903 10.1785 18.455 9.8834V9.8834Z"
-                  stroke={"black"}
-                  strokeWidth="1.5"
+                  d="M22 2L11 13"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <Path
+                  d="M22 2L15 22L11 13L2 9L22 2Z"
+                  stroke="white"
+                  strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
@@ -203,10 +189,28 @@ const Comment = ({
         data={comments}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.commentsList}
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={handleLoading} />
         }
       />
+
+      {/* Fixed Comment Input Button */}
+      <TouchableOpacity
+        style={[styles.fixedCommentButton, { backgroundColor: colors.primary }]}
+        onPress={handleComment}
+        activeOpacity={0.8}
+      >
+        <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+          <Path
+            d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0035 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </Svg>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -236,6 +240,98 @@ const styles = StyleSheet.create({
     width: "100%",
     alignSelf: "center",
     justifyContent: "center",
+  },
+  modalOverlay: {
+    justifyContent: "flex-end",
+    alignSelf: "stretch",
+    alignItems: "center",
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  commentInputContainer: {
+    padding: 15,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    flexDirection: "row",
+    alignSelf: "stretch",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+    width: '100%',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  commentInput: {
+    flex: 1,
+    minHeight: 45,
+    maxHeight: 100,
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 12,
+    paddingHorizontal: 15,
+    fontSize: FontSize.labelLargeBold_size,
+    fontFamily: FontFamily.typographyLabelLarge,
+  },
+  sendButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  commentsList: {
+    paddingBottom: 80, // Add padding at the bottom for the fixed button
+  },
+  fixedCommentButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.05)',
+    marginBottom: 5,
+  },
+  headerButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  commentCountContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+  },
+  commentCount: {
+    fontFamily: FontFamily.labelMediumBold,
+    fontSize: FontSize.labelMediumBold_size,
+    fontWeight: '600',
   },
 });
 

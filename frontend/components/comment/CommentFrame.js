@@ -31,6 +31,22 @@ const CommentFrame = ({ id, username, date, text }) => {
   //   getUserById();
   // }, [])
 
+  // Format date if it's in YYYY-MM-DD format
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+
+    try {
+      const [year, month, day] = dateString.split('-');
+      if (year && month && day) {
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return `${day} ${months[parseInt(month) - 1]} ${year}`;
+      }
+      return dateString;
+    } catch (error) {
+      return dateString;
+    }
+  };
+
   return (
     <View
       key={id}
@@ -47,7 +63,7 @@ const CommentFrame = ({ id, username, date, text }) => {
           style={[
             styles.username,
             styles.usernameTypo,
-            { color: colors.onSurfaceVarient },
+            { color: colors.onSurface },
           ]}
         >
           {username}
@@ -55,11 +71,10 @@ const CommentFrame = ({ id, username, date, text }) => {
         <Text
           style={[
             styles.ddmmyyyy,
-            styles.usernameTypo,
-            { color: colors.primary },
+            { color: 'rgba(128, 128, 128, 0.8)' },
           ]}
         >
-          {date}
+          {formatDate(date)}
         </Text>
       </View>
       <Text style={[styles.text, { color: colors.onSurface }]}>{text}</Text>
@@ -77,12 +92,18 @@ const styles = StyleSheet.create({
     fontSize: FontSize.labelLargeBold_size,
   },
   ddmmyyyy: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.labelSmallRegular_size,
+    fontFamily: FontFamily.typographyLabelLarge,
+    opacity: 0.8,
   },
   usernameParent: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     alignSelf: "stretch",
+    paddingBottom: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.05)',
   },
   text: {
     fontFamily: FontFamily.typographyLabelLarge,
@@ -90,20 +111,22 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     textAlign: "left",
     marginTop: 10,
+    lineHeight: 22,
   },
   frameParent: {
     borderRadius: Border.br_3xs,
-    marginTop: 10,
+    marginTop: 15,
     marginHorizontal: 10,
     padding: Padding.p_3xs,
+    paddingVertical: 15,
     alignSelf: "stretch",
     shadowOffset: {
       width: 1,
-      height: 1,
+      height: 2,
     },
-    shadowRadius: 5,
-    elevation: 5,
-    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 4,
+    shadowOpacity: 0.25,
   },
 });
 

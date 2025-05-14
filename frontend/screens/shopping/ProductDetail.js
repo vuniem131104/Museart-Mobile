@@ -67,9 +67,10 @@ const ProductDetail = () => {
         <ScrollView style={styles.body}>
           <Picture
             imagePath={product.image_url}
-            commentAmount={""}
-            likeAmount={""}
             date={product.timestamp}
+            altText={product.title}
+            id={product.id}
+            type="product"
           />
           <AboutTitle
             title={product.title}
