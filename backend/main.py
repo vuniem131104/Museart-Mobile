@@ -17,14 +17,81 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request, UploadFile, File
 from fastapi.responses import JSONResponse
 import uvicorn
-# from image_retrieval import ImageRetriever
+from groq import Groq
+from typing import List, Dict
+import chromadb
+from chromadb.config import Settings
+from PIL import Image
+import requests
+from io import BytesIO
+import torch
+from transformers import CLIPProcessor, CLIPModel
+import numpy as np
+
 load_dotenv()
 
-# image_retriever = ImageRetriever()
+model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+
+chroma_client = chromadb.PersistentClient(
+    path='image_embeddings'
+)
+
+collection = chroma_client.get_or_create_collection(
+    name="image"
+)
+
+def get_image_embedding(image_url: str) -> np.ndarray:
+    try:
+        if image_url.startswith("http"):
+            response = requests.get(image_url)
+            image = Image.open(BytesIO(response.content)).convert("RGB")
+        else:
+            image = Image.open(image_url).convert("RGB")
+        
+        inputs = processor(images=image, return_tensors="pt")
+        with torch.no_grad():
+            image_features = model.get_image_features(**inputs)
+        
+        embedding = image_features.numpy()[0]
+        embedding = embedding / np.linalg.norm(embedding)
+        return embedding
+        
+    except Exception as e:
+        print(f"Error processing image {image_url}: {str(e)}")
+        return None
+    
+    
+def retrieve_similar_images(query_image_url: str, n_results: int = 5) -> List[Dict]:
+    query_embedding = get_image_embedding(query_image_url)
+    if query_embedding is None:
+        return []
+    
+    results = collection.query(
+        query_embeddings=[query_embedding.tolist()],
+        n_results=n_results
+    )
+    
+    return [
+        {
+            "metadata": meta,
+            "distance": dist
+        }
+        for meta, dist in zip(
+            results["metadatas"][0],
+            results["distances"][0]
+        )
+    ]
 
 app = FastAPI()
 
-llm = ChatGroq(api_key=os.getenv("GROQ_API_KEY"), model="llama3-70b-8192")
+client = Groq(
+    api_key=os.getenv("GROQ_API_KEY"),
+)
+
+MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
+
+llm = ChatGroq(api_key=os.getenv("GROQ_API_KEY"), model=MODEL)
 
 prompt = ChatPromptTemplate.from_template(
     """
@@ -106,48 +173,34 @@ async def root():
 async def chat(request: Request):
     data = await request.json()
     input_text = data.get("input")
+    # input_text = 'hello'
     answer = conversational_rag_chain.invoke({
         "input": input_text
     }, config={
         "configurable": {"session_id": "default"}
     })
-    return JSONResponse(content={"answer": answer.content})
+    return JSONResponse(content={"answer": answer['answer']})
 
 @app.post("/image_search")
 async def image_search(file: UploadFile = File(...)):
-    # temp_image_path = f"temp_{file.filename}"
-    # with open(temp_image_path, "wb") as buffer:
-    #     shutil.copyfileobj(file.file, buffer)
+    temp_image_path = f"temp_{file.filename}"
+    with open(temp_image_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
 
-    # Here you would process the image with your image retriever
-    # For now, we'll return test data in the correct format
-    answer = [
-        {   
-            "id": 22,
-            "image_id": "a76844cc-cec8-6026-5609-50d3961aed4c",
-            "title": "Villa Pamphili outside Porta S. Pancrazio, from Views of Rome",
-            "alt_text": "A work made of etching on heavy ivory laid paper."
-        },
-        {   
-            "id": 24202,
-            "image_id": "e127aa5e-2154-5116-76e1-0c3f0c4a7cb4",
-            "title": "The Great Wave off Kanagawa",
-            "alt_text": "A beautiful image of a cat"
-        }
-    ]
+    results = retrieve_similar_images(temp_image_path, n_results=5)
+    answer = []
+    for result in results:
+        answer.append({
+            "id": result["metadata"]["id"],
+            "image_id": result["metadata"]["image_id"],
+            "title": result["metadata"]["title"],
+            "alt_text": result["metadata"]["alt_text"]
+        })
 
-    # os.remove(temp_image_path)
-
-    # result = []
-    # for item in answer:
-    #     result.append({
-    #         "title": item["metadata"]["title"],
-    #         "url": item["url"],
-    #         "text": item["metadata"]["text"]
-    #     })
+    os.remove(temp_image_path)
     return JSONResponse(content={"answer": answer})
 
-model = WhisperModel("base")
+model_stt = WhisperModel("base")
 
 @app.post("/speech-to-text")
 async def speech_to_text(audio: UploadFile = File(...)):
@@ -156,11 +209,56 @@ async def speech_to_text(audio: UploadFile = File(...)):
         audio_data = await audio.read()
         temp_file.write(audio_data)
 
-    # Transcribe using Whisper
-    segments, _ = model.transcribe(temp_path)
+    segments, _ = model_stt.transcribe(temp_path)
     transcript = ''.join([segment.text for segment in segments])
 
     return {"text": transcript}
+
+@app.post("/summary")
+async def summary_article(request: Request):
+    data = await request.json()
+    title = data.get("title", "")
+    content = data.get("content", "")
+    if not title or not content:
+        return JSONResponse(content={"error": "Title and content are required."}, status_code=400)
+
+    system_prompt = """
+    You are a summarization assistant. Your sole task is to read the input article and return a clear, concise summary based on the content.
+    Do not explain your process, do not add introductions or conclusions, and do not say anything besides the summary itself.
+    The summary must:
+
+    Focus on the key points of the article.
+
+    Use neutral, informative language.
+
+    Fit within the specified length (e.g., short paragraph or 3–5 sentences).
+
+    Mention any significant details like people, events, techniques, or materials.
+    Output only the summary. No commentary, no formatting, no extra text.
+    """
+
+    user_prompt = f"""
+    Please summarize the following article about an art exhibition:
+    Title: {title}\n
+    Content: {content}
+    """
+
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "system",
+                "content": system_prompt
+            },
+            {
+                "role": "user",
+                "content": user_prompt,
+            }
+        ],
+        model="meta-llama/llama-4-scout-17b-16e-instruct",
+        temperature=0.3,
+    )
+
+    return JSONResponse(content={"summary": chat_completion.choices[0].message.content})
 
 
 if __name__ == "__main__":

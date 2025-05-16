@@ -118,7 +118,7 @@ const Articles = () => {
                 id={item.id}
                 article={item.title}
                 date={item.timestamp}
-                text={item.copy}>
+                text={item.copy.trim()}>
             </ArticleComponent>
         )
     }

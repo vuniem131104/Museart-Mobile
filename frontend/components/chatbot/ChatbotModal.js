@@ -14,10 +14,10 @@ import {
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { API_URL } from '../../services/api'; // Adjust the import path as necessary
 
 const { width, height } = Dimensions.get('window');
 
-const API_URL = 'http://192.168.1.11:8000'; 
 
 const getChatResponse = async (userMessage) => {
   try {

@@ -8,9 +8,9 @@ import { baseUrl } from "../../services/api";
 import * as ImagePicker from 'expo-image-picker';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
+import { API_URL } from "../../services/api";
 
 const DashboardSearchEngine = () => {
-  const API_URL = 'http://192.168.1.11:8000'
   const [ isLoading, setLoading ] = useState(false);
   const [ data, setData ] = useState([]);
   const [ page, setPage ] = useState(1);
@@ -148,7 +148,7 @@ const DashboardSearchEngine = () => {
         type: 'audio/wav'
       });
   
-      const response = await axios.post('http://192.168.1.11:8000/speech-to-text', formData, {
+      const response = await axios.post(`${API_URL}/speech-to-text`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
