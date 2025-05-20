@@ -21,8 +21,7 @@ const NotificationSuccess = () => {
       />
       <Text style={[styles.success, styles.successFlexBox]}>Success</Text>
       <Text style={[styles.referenceSiteAboutLorem, styles.successFlexBox, {marginBottom: 5}]}>
-        Reference site about Lorem Ipsum, giving information on its origins, as
-        well as a random Lipsum generator.
+        Your order has been placed successfully!
       </Text>
     </View>
   );
@@ -50,7 +49,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   success: {
-    fontSize: FontSize.headline3Bold_size,
+    fontSize: 30,
     fontWeight: "700",
     fontFamily: FontFamily.labelMediumBold,
     color: Color.colorMediumseagreen_200,

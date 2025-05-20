@@ -229,7 +229,7 @@ async def summary_article(request: Request):
 
     Focus on the key points of the article.
 
-    Use neutral, informative language.
+    Use neutral, informative language.  
 
     Fit within the specified length (e.g., short paragraph or 3–5 sentences).
 
