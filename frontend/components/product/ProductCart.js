@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, TextInput } from "react-native";
+import React, { useEffect, useState, useContext } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, TextInput, Alert } from "react-native";
 import { Color, Border, FontFamily, FontSize, Padding } from "../../GlobalStyles";
 import ButtonPrimary from "../button/ButtonPrimary";
 import { useNavigation, useTheme } from "@react-navigation/native";
+import { AuthContext } from "../../context/authContext";
+import axios from "axios";
+import { backendUrl } from "../../services/api";
 
 const ProductCash = ({
   id,
@@ -15,6 +18,7 @@ const ProductCash = ({
 }) => {
   const navigation = useNavigation();
   const { colors } = useTheme();
+  const { accessToken } = useContext(AuthContext);
   const [number, setNumber] = useState(amount);
   const [deleted, setDeleted] = useState(false);
 
@@ -22,9 +26,17 @@ const ProductCash = ({
     onAmoutChange(id, number);
   }, [number]);
 
-  useEffect(() => {
-    if (deleted) setNumber(0);
-  }, [deleted]);
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${backendUrl}/cart/${id}`, {
+        headers: { 'x-access-token': accessToken }
+      });
+      setDeleted(true);
+    } catch (error) {
+      console.error("Error removing item from cart:", error);
+      Alert.alert("Error", "Failed to remove item from cart");
+    }
+  };
 
   if (deleted) return;
   return (
@@ -78,7 +90,7 @@ const ProductCash = ({
                     image={require("../../assets/group-22.png")}
                     buttonPrimaryBackgroundColor={"unset"}
                     buttonPrimaryPaddingHorizontal={0}
-                    onPressButton={() => setDeleted(true)}
+                    onPressButton={handleDelete}
                   />
                 </View>
               </View>

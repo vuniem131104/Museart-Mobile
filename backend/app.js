@@ -7,6 +7,7 @@ const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const exhibitionRoutes = require("./routes/exhibition.routes");
 const artworkRoutes = require("./routes/artwork.routes");
+const cartRoutes = require("./routes/cart.routes");
 
 // Khởi tạo Express app
 const app = express();
@@ -25,6 +26,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/exhibition", exhibitionRoutes);
 app.use("/api/artwork", artworkRoutes);
+app.use("/api/cart", cartRoutes);
 
 // Route mặc định
 app.get("/", (req, res) => {

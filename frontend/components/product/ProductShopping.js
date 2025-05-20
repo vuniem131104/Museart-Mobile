@@ -1,8 +1,11 @@
-import React from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from "react-native";
+import React, { useContext } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, Alert } from "react-native";
 import { Color, Border, FontFamily, FontSize, Padding } from "../../GlobalStyles";
 import ButtonPrimary from "../button/ButtonPrimary";
 import { useNavigation, useTheme } from "@react-navigation/native";
+import { AuthContext } from "../../context/authContext";
+import axios from "axios";
+import { baseUrl, backendUrl } from "../../services/api";
 
 const ProductShopping = ({
   title,
@@ -13,6 +16,7 @@ const ProductShopping = ({
 }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
+  const { accessToken, isGuest } = useContext(AuthContext);
 
   return (
     <View className={'w-screen items-center justify-center px-2.5'}>
@@ -46,7 +50,32 @@ const ProductShopping = ({
                   buttonPrimaryPaddingVerticalVertical={10}
                   buttonPrimaryPaddingHorizontal={15}
                   buttonPrimaryBorderWidth={2}
-                  onPressButton={() => { navigation.navigate('Cart') }}
+                  onPressButton={() => {
+                    if (isGuest) {
+                      Alert.alert(
+                        "Authentication Required",
+                        "Please sign in to add items to your cart",
+                        [
+                          { text: "Cancel", style: "cancel" },
+                          { text: "Sign In", onPress: () => navigation.navigate("SignIn") }
+                        ]
+                      );
+                      return;
+                    }
+
+                    // Add item to cart
+                    axios.post(`${backendUrl}/cart`,
+                      { itemId: id, quantity: 1 },
+                      { headers: { 'x-access-token': accessToken } }
+                    )
+                    .then(response => {
+                      Alert.alert("Success", "Item added to cart");
+                    })
+                    .catch(error => {
+                      console.error("Error adding to cart:", error);
+                      Alert.alert("Error", "Failed to add item to cart");
+                    });
+                  }}
                   image={require("../../assets/vector2.png")} />
               </View>
             </View>

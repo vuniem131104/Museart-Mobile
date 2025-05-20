@@ -7,11 +7,12 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
+  Alert,
 } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { baseUrl } from "../../services/api";
+import { baseUrl, backendUrl } from "../../services/api";
 import axios from "axios";
 import {
   FontSize,
@@ -24,9 +25,11 @@ import AboutTitle from "../../components/detail/content/AboutTitle";
 import NavbarTop from "../../components/header/NavbarTop";
 import Picture from "../../components/detail/picture/Picture";
 import HTMLRender from "react-native-render-html";
+import { AuthContext } from "../../context/authContext";
 
 const ProductDetail = () => {
   const navigation = useNavigation();
+  const { accessToken, isGuest } = useContext(AuthContext);
 
   const route = useRoute();
   const { ID } = route.params;
@@ -117,7 +120,30 @@ const ProductDetail = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("Cart");
+                  if (isGuest) {
+                    Alert.alert(
+                      "Authentication Required",
+                      "Please sign in to add items to your cart",
+                      [
+                        { text: "Cancel", style: "cancel" },
+                        { text: "Sign In", onPress: () => navigation.navigate("SignIn") }
+                      ]
+                    );
+                    return;
+                  }
+
+                  // Add item to cart
+                  axios.post(`${backendUrl}/cart`,
+                    { itemId: product.id, quantity: 1 },
+                    { headers: { 'x-access-token': accessToken } }
+                  )
+                  .then(response => {
+                    Alert.alert("Success", "Item added to cart");
+                  })
+                  .catch(error => {
+                    console.error("Error adding to cart:", error);
+                    Alert.alert("Error", "Failed to add item to cart");
+                  });
                 }}
                 style={[styles.savebutton, styles.savebuttonSpaceBlock]}
               >
