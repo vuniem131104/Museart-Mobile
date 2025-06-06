@@ -43,7 +43,6 @@ const BoardExtraInfo = ({ date, id, type }) => {
       if (userInfo) {
         const checkReaction = await axios.get(
           `${backendUrl}/${type}/${id}/check-reaction`
-          // { headers: { Authorization: `${userInfo.token}` } }
         );
         setIsLiked(checkReaction.data.hasReacted);
       }
@@ -56,7 +55,6 @@ const BoardExtraInfo = ({ date, id, type }) => {
     try {
       const response = await axios.get(`${backendUrl}/${type}/${id}/comments`);
       setComments(response.data);
-      console.log(response);
     } catch (error) {
       console.error(error);
     }
@@ -67,19 +65,19 @@ const BoardExtraInfo = ({ date, id, type }) => {
       navigation.navigate("Login");
       return;
     }
-    console.log(userInfo);
+    // console.log(userInfo);
+    
+    setIsLiked(!isLiked);
+    setLikeAmount((prev) => isLiked ? prev - 1 : prev + 1);
+
     try {
       await axios.post(`${backendUrl}/${type}/${id}/reactions`, {
         type: "like",
       });
-      if (isLiked) {
-        setLikeAmount((prev) => prev - 1);
-      } else {
-        setLikeAmount((prev) => prev + 1);
-      }
-      setIsLiked(!isLiked);
     } catch (error) {
       console.error("Error handling like:", error);
+      setIsLiked(!isLiked);
+      setLikeAmount((prev) => isLiked ? prev + 1 : prev - 1);
     }
   };
 
