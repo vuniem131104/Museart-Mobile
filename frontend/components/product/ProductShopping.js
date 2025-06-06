@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, Alert } from "react-native";
 import { Color, Border, FontFamily, FontSize, Padding } from "../../GlobalStyles";
 import ButtonPrimary from "../button/ButtonPrimary";
@@ -6,6 +6,8 @@ import { useNavigation, useTheme } from "@react-navigation/native";
 import { AuthContext } from "../../context/authContext";
 import axios from "axios";
 import { baseUrl, backendUrl } from "../../services/api";
+import ConfirmModal from "../modal/ConfirmModal";
+import SuccessModal from "../modal/SuccessModal";
 
 const ProductShopping = ({
   title,
@@ -17,6 +19,34 @@ const ProductShopping = ({
   const { colors } = useTheme();
   const navigation = useNavigation();
   const { accessToken, isGuest } = useContext(AuthContext);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+
+  const handleAddToCart = () => {
+    if (isGuest) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    // Add item to cart
+    axios.post(`${backendUrl}/cart`,
+      { itemId: id, quantity: 1 },
+      { headers: { 'x-access-token': accessToken } }
+    )
+    .then(response => {
+      setShowSuccessModal(true);
+    })
+    .catch(error => {
+      console.error("Error adding to cart:", error);
+      setShowErrorModal(true);
+    });
+  };
+
+  const handleAuthConfirm = () => {
+    setShowAuthModal(false);
+    navigation.navigate("SignIn");
+  };
 
   return (
     <View className={'w-screen items-center justify-center px-2.5'}>
@@ -50,38 +80,46 @@ const ProductShopping = ({
                   buttonPrimaryPaddingVerticalVertical={10}
                   buttonPrimaryPaddingHorizontal={15}
                   buttonPrimaryBorderWidth={2}
-                  onPressButton={() => {
-                    if (isGuest) {
-                      Alert.alert(
-                        "Authentication Required",
-                        "Please sign in to add items to your cart",
-                        [
-                          { text: "Cancel", style: "cancel" },
-                          { text: "Sign In", onPress: () => navigation.navigate("SignIn") }
-                        ]
-                      );
-                      return;
-                    }
-
-                    // Add item to cart
-                    axios.post(`${backendUrl}/cart`,
-                      { itemId: id, quantity: 1 },
-                      { headers: { 'x-access-token': accessToken } }
-                    )
-                    .then(response => {
-                      Alert.alert("Success", "Item added to cart");
-                    })
-                    .catch(error => {
-                      console.error("Error adding to cart:", error);
-                      Alert.alert("Error", "Failed to add item to cart");
-                    });
-                  }}
+                  onPressButton={handleAddToCart}
                   image={require("../../assets/vector2.png")} />
               </View>
             </View>
           </View>
         </View>
       </TouchableOpacity>
+      
+      {/* Authentication Modal */}
+      <ConfirmModal
+        visible={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onConfirm={handleAuthConfirm}
+        title="Authentication Required"
+        message="Please sign in to add items to your cart. You'll get access to exclusive features and personalized recommendations."
+        confirmText="Sign In"
+        cancelText="Cancel"
+        confirmColor={colors.primary}
+      />
+      
+      {/* Success Modal */}
+      <SuccessModal
+        visible={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="Added to Cart"
+        message={`"${title}" has been successfully added to your cart.`}
+        buttonText="Continue Shopping"
+      />
+      
+      {/* Error Modal */}
+      <ConfirmModal
+        visible={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        onConfirm={() => setShowErrorModal(false)}
+        title="Error"
+        message="Failed to add item to cart. Please check your connection and try again."
+        confirmText="Try Again"
+        cancelText="Cancel"
+        confirmColor="#FF4444"
+      />
     </View>
   );
 };

@@ -70,7 +70,7 @@ const ExhibitionDetail = () => {
           <AboutTitle
             title={exhibition.title}
             tagRoute={"Exhibition"}
-            tagDetail={"Exhibition"}
+            tagDetail={"Detail"}
             isPrice={false}
           />
           <AboutArtist />

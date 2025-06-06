@@ -9,6 +9,8 @@ import MyFlatList from "../../components/MyFlatList";
 import ButtonPrimary from "../../components/button/ButtonPrimary";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../GlobalStyles";
 import { AuthContext } from "../../context/authContext";
+import ConfirmModal from "../../components/modal/ConfirmModal";
+import SuccessModal from "../../components/modal/SuccessModal";
 
 const Cart = () => {
     const navigation = useNavigation();
@@ -18,6 +20,8 @@ const Cart = () => {
     const [ cartItems, setCartItems ] = useState([]);
     const [ numberOfProduct, setNumberOfProduct ] = useState(0);
     const [ totalPrice, setTotalPrice ] = useState(0);
+    const [ showConfirmModal, setShowConfirmModal ] = useState(false);
+    const [ showSuccessModal, setShowSuccessModal ] = useState(false);
 
     // Redirect to login if not authenticated
     useEffect(() => {
@@ -130,7 +134,8 @@ const Cart = () => {
             });
 
             setCartItems([]);
-            Alert.alert("Success", "Cart cleared successfully");
+            setShowConfirmModal(false);
+            setShowSuccessModal(true);
         } catch (error) {
             console.error("Error clearing cart:", error);
             Alert.alert("Error", "Failed to clear cart");
@@ -188,7 +193,7 @@ const Cart = () => {
                                         text={"Clear Cart"}
                                         buttonPrimaryMarginTop={30}
                                         buttonPrimaryBackgroundColor={Color.colorRed}
-                                        onPressButton={handleClearCart}
+                                        onPressButton={() => setShowConfirmModal(true)}
                                     />
                                     <ButtonPrimary
                                         text={"Pay now"}
@@ -201,6 +206,25 @@ const Cart = () => {
                     )}
                 </>
             )}
+            
+            <ConfirmModal
+                visible={showConfirmModal}
+                onClose={() => setShowConfirmModal(false)}
+                onConfirm={handleClearCart}
+                title="Clear Cart"
+                message="Are you sure you want to remove all items from your cart? This action cannot be undone."
+                confirmText="Yes"
+                cancelText="Cancel"
+                confirmColor="#FF4444"
+            />
+            
+            {/* <SuccessModal
+                visible={showSuccessModal}
+                onClose={() => setShowSuccessModal(false)}
+                title="Cart Cleared"
+                message="All items have been successfully removed from your cart."
+                buttonText="Continue Shopping"
+            /> */}
         </View>
     );
 }

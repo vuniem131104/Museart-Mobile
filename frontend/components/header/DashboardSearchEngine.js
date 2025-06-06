@@ -34,7 +34,7 @@ const DashboardSearchEngine = () => {
     try {
       const response = await axios.get(`${baseUrl}/${model}/search?q="${q}"&page=${page}`);
       setData(response.data.data);
-      // console.log(data);
+      console.log(data);
       setTotalpages(response.data.pagination.total_pages);
       setLoading(false);
     } catch (error) {
