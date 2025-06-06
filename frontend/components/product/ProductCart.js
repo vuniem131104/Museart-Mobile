@@ -15,12 +15,12 @@ const ProductCash = ({
   image,
   amount,
   onAmoutChange,
+  onDelete,
 }) => {
   const navigation = useNavigation();
   const { colors } = useTheme();
   const { accessToken } = useContext(AuthContext);
   const [number, setNumber] = useState(amount);
-  const [deleted, setDeleted] = useState(false);
 
   useEffect(() => {
     onAmoutChange(id, number);
@@ -31,14 +31,15 @@ const ProductCash = ({
       await axios.delete(`${backendUrl}/cart/${id}`, {
         headers: { 'x-access-token': accessToken }
       });
-      setDeleted(true);
+      // Notify parent component to remove this item from the list
+      if (onDelete) {
+        onDelete(id);
+      }
     } catch (error) {
       console.error("Error removing item from cart:", error);
       Alert.alert("Error", "Failed to remove item from cart");
     }
   };
-
-  if (deleted) return;
   return (
     <View className={'w-screen items-center justify-center px-2.5'}>
       <TouchableOpacity onPress={() =>
