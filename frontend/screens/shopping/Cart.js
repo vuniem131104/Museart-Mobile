@@ -110,6 +110,11 @@ const Cart = () => {
         }
     }
 
+    const handleDeleteItem = (id) => {
+        // Remove the item from local state after successful deletion
+        setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    }
+
     const renderItem = ({ item }) => {
         return (
             <ProductCart key={item.id}
@@ -120,6 +125,7 @@ const Cart = () => {
                 image={item.image_url}
                 amount={item.amount}
                 onAmoutChange={handleAmountChange}
+                onDelete={handleDeleteItem}
             >
             </ProductCart>
         )
