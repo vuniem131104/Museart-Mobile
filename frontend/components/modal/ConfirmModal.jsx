@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Modal,
   View,
@@ -8,11 +8,11 @@ import {
   Dimensions,
   Animated,
   TouchableWithoutFeedback,
-} from 'react-native';
-import { useTheme } from '@react-navigation/native';
-import { FontFamily, FontSize, Border, Padding } from '../../GlobalStyles';
+} from "react-native";
+import { useTheme } from "@react-navigation/native";
+import { FontFamily, FontSize, Border, Padding } from "../../GlobalStyles";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const ConfirmModal = ({
   visible,
@@ -20,9 +20,9 @@ const ConfirmModal = ({
   onConfirm,
   title,
   message,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
-  confirmColor = '#FF4444',
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  confirmColor = "#FF4444",
 }) => {
   const { colors } = useTheme();
   const scaleValue = React.useRef(new Animated.Value(0)).current;
@@ -90,33 +90,40 @@ const ConfirmModal = ({
                 <Text style={[styles.title, { color: colors.onSurface }]}>
                   {title}
                 </Text>
-                <Text style={[styles.message, { color: colors.onSurfaceVariant }]}>
+                <Text
+                  style={[styles.message, { color: colors.onSurfaceVarient }]}
+                >
                   {message}
                 </Text>
-                
+
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
                     style={[
                       styles.button,
                       styles.cancelButton,
-                      { backgroundColor: colors.surfaceVariant }
+                      { backgroundColor: colors.surfaceVariant },
                     ]}
                     onPress={onClose}
                   >
-                    <Text style={[styles.buttonText, { color: colors.onSurfaceVariant }]}>
+                    <Text
+                      style={[
+                        styles.buttonText,
+                        { color: colors.onSurfaceVarient },
+                      ]}
+                    >
                       {cancelText}
                     </Text>
                   </TouchableOpacity>
-                  
+
                   <TouchableOpacity
                     style={[
                       styles.button,
                       styles.confirmButton,
-                      { backgroundColor: '#a00000' }
+                      { backgroundColor: "#a00000" },
                     ]}
                     onPress={onConfirm}
                   >
-                    <Text style={[styles.buttonText, { color: '#FFFFFF' }]}>
+                    <Text style={[styles.buttonText, { color: "#FFFFFF" }]}>
                       {confirmText}
                     </Text>
                   </TouchableOpacity>
@@ -133,9 +140,9 @@ const ConfirmModal = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContainer: {
     width: width * 0.85,
@@ -155,20 +162,20 @@ const styles = StyleSheet.create({
   title: {
     fontSize: FontSize.headlineSmall_size,
     fontFamily: FontFamily.labelMediumBold,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
     marginBottom: 12,
   },
   message: {
     fontSize: FontSize.bodyMedium_size,
     fontFamily: FontFamily.typographyLabelLarge,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 20,
     marginBottom: 24,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     gap: 12,
   },
   button: {
@@ -176,8 +183,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   cancelButton: {
     marginRight: 6,
@@ -188,7 +195,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: FontSize.labelLarge_size,
     fontFamily: FontFamily.labelMediumBold,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });
 

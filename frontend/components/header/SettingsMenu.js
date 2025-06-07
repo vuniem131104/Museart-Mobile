@@ -33,9 +33,9 @@ import axios from "axios";
 import { Alert } from "react-native";
 
 const ModalComponent = ({ visible, onClose, title, content, colors }) => {
-  const [ fadeAnim ] = useState(new Animated.Value(0));
-  const [ scaleAnim ] = useState(new Animated.Value(0.8));
-  const [ slideAnim ] = useState(new Animated.Value(0));
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [scaleAnim] = useState(new Animated.Value(0.8));
+  const [slideAnim] = useState(new Animated.Value(0));
   const isDarkMode = useSelector((state) => state.theme.isDarkMode);
 
   React.useEffect(() => {
@@ -77,7 +77,7 @@ const ModalComponent = ({ visible, onClose, title, content, colors }) => {
         }),
       ]).start();
     }
-  }, [ visible ]);
+  }, [visible]);
 
   if (!visible) return null;
 
@@ -98,8 +98,8 @@ const ModalComponent = ({ visible, onClose, title, content, colors }) => {
                 { scale: scaleAnim },
                 {
                   translateY: slideAnim.interpolate({
-                    inputRange: [ 0, 1 ],
-                    outputRange: [ 50, 0 ],
+                    inputRange: [0, 1],
+                    outputRange: [50, 0],
                   }),
                 },
               ],
@@ -109,8 +109,8 @@ const ModalComponent = ({ visible, onClose, title, content, colors }) => {
           <LinearGradient
             colors={
               isDarkMode
-                ? [ colors.primary, colors.primaryContainer ]
-                : [ colors.primary, colors.primaryFixed ]
+                ? [colors.primary, colors.primaryContainer]
+                : [colors.primary, colors.primaryFixed]
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -131,7 +131,7 @@ const ModalComponent = ({ visible, onClose, title, content, colors }) => {
                     color={colors.onPrimary}
                   />
                 )}
-                <Text style={[ styles.modalTitle, { color: colors.onPrimary } ]}>
+                <Text style={[styles.modalTitle, { color: colors.onPrimary }]}>
                   {title}
                 </Text>
               </View>
@@ -167,7 +167,7 @@ const ModalComponent = ({ visible, onClose, title, content, colors }) => {
                       color={colors.primary}
                     />
                   </View>
-                  <Text style={[ styles.modalText, { color: colors.onSurface } ]}>
+                  <Text style={[styles.modalText, { color: colors.onSurface }]}>
                     {content}
                   </Text>
                   <View style={styles.featuresContainer}>
@@ -227,7 +227,7 @@ const ModalComponent = ({ visible, onClose, title, content, colors }) => {
                       color={colors.primary}
                     />
                   </View>
-                  <Text style={[ styles.modalText, { color: colors.onSurface } ]}>
+                  <Text style={[styles.modalText, { color: colors.onSurface }]}>
                     {content}
                   </Text>
                   <View style={styles.feedbackContainer}>
@@ -285,8 +285,8 @@ const ModalComponent = ({ visible, onClose, title, content, colors }) => {
               <LinearGradient
                 colors={
                   isDarkMode
-                    ? [ colors.primary, colors.primaryContainer ]
-                    : [ colors.primary, colors.primaryFixed ]
+                    ? [colors.primary, colors.primaryContainer]
+                    : [colors.primary, colors.primaryFixed]
                 }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -325,17 +325,17 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
     isLoading: authLoading,
     updateUserInfoState,
   } = useContext(AuthContext);
-  const [ name, setName ] = useState(userInfo?.username || "");
-  const [ isLoading, setIsLoading ] = useState(false);
-  const [ error, setError ] = useState(null);
-  const [ fadeAnim ] = useState(new Animated.Value(0));
-  const [ scaleAnim ] = useState(new Animated.Value(0.8));
-  const [ slideAnim ] = useState(new Animated.Value(0));
-  const [ showPasswordChange, setShowPasswordChange ] = useState(false);
-  const [ currentPassword, setCurrentPassword ] = useState("");
-  const [ newPassword, setNewPassword ] = useState("");
-  const [ confirmPassword, setConfirmPassword ] = useState("");
-  const [ passwordError, setPasswordError ] = useState(null);
+  const [name, setName] = useState(userInfo?.username || "");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [scaleAnim] = useState(new Animated.Value(0.8));
+  const [slideAnim] = useState(new Animated.Value(0));
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(null);
   const isDarkMode = useSelector((state) => state.theme.isDarkMode);
   const { backendUrl } = require("../../services/api");
 
@@ -379,7 +379,7 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
         }),
       ]).start();
     }
-  }, [ visible ]);
+  }, [visible]);
 
   const handleUpdate = async () => {
     if (!name.trim()) {
@@ -487,8 +487,8 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                 { scale: scaleAnim },
                 {
                   translateY: slideAnim.interpolate({
-                    inputRange: [ 0, 1 ],
-                    outputRange: [ 50, 0 ],
+                    inputRange: [0, 1],
+                    outputRange: [50, 0],
                   }),
                 },
               ],
@@ -498,8 +498,8 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
           <LinearGradient
             colors={
               isDarkMode
-                ? [ colors.primary, colors.primaryContainer ]
-                : [ colors.primary, colors.primaryFixed ]
+                ? [colors.primary, colors.primaryContainer]
+                : [colors.primary, colors.primaryFixed]
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -512,7 +512,7 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                   size={24}
                   color={colors.onPrimary}
                 />
-                <Text style={[ styles.modalTitle, { color: colors.onPrimary } ]}>
+                <Text style={[styles.modalTitle, { color: colors.onPrimary }]}>
                   {showPasswordChange ? "Đổi mật khẩu" : "Chỉnh sửa hồ sơ"}
                 </Text>
               </View>
@@ -548,7 +548,7 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                       color={colors.primary}
                     />
                     <Text
-                      style={[ styles.inputLabel, { color: colors.primary } ]}
+                      style={[styles.inputLabel, { color: colors.primary }]}
                     >
                       Tên
                     </Text>
@@ -578,7 +578,7 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                       value={name}
                       onChangeText={setName}
                       placeholder="Nhập tên của bạn"
-                      placeholderTextColor={colors.onSurfaceVariant}
+                      placeholderTextColor={colors.onSurfaceVarient}
                     />
                   </View>
                   {error && (
@@ -588,7 +588,7 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                         size={16}
                         color={colors.error}
                       />
-                      <Text style={[ styles.errorText, { color: colors.error } ]}>
+                      <Text style={[styles.errorText, { color: colors.error }]}>
                         {error}
                       </Text>
                     </View>
@@ -622,8 +622,8 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                   <LinearGradient
                     colors={
                       isDarkMode
-                        ? [ colors.primary, colors.primaryContainer ]
-                        : [ colors.primary, colors.primaryFixed ]
+                        ? [colors.primary, colors.primaryContainer]
+                        : [colors.primary, colors.primaryFixed]
                     }
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
@@ -670,7 +670,7 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                       color={colors.primary}
                     />
                     <Text
-                      style={[ styles.inputLabel, { color: colors.primary } ]}
+                      style={[styles.inputLabel, { color: colors.primary }]}
                     >
                       Mật khẩu hiện tại
                     </Text>
@@ -702,7 +702,7 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                       value={currentPassword}
                       onChangeText={setCurrentPassword}
                       placeholder="Nhập mật khẩu hiện tại"
-                      placeholderTextColor={colors.onSurfaceVariant}
+                      placeholderTextColor={colors.onSurfaceVarient}
                       secureTextEntry
                     />
                   </View>
@@ -716,7 +716,7 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                       color={colors.primary}
                     />
                     <Text
-                      style={[ styles.inputLabel, { color: colors.primary } ]}
+                      style={[styles.inputLabel, { color: colors.primary }]}
                     >
                       Mật khẩu mới
                     </Text>
@@ -748,7 +748,7 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                       value={newPassword}
                       onChangeText={setNewPassword}
                       placeholder="Nhập mật khẩu mới"
-                      placeholderTextColor={colors.onSurfaceVariant}
+                      placeholderTextColor={colors.onSurfaceVarient}
                       secureTextEntry
                     />
                   </View>
@@ -762,7 +762,7 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                       color={colors.primary}
                     />
                     <Text
-                      style={[ styles.inputLabel, { color: colors.primary } ]}
+                      style={[styles.inputLabel, { color: colors.primary }]}
                     >
                       Xác nhận mật khẩu
                     </Text>
@@ -794,7 +794,7 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                       value={confirmPassword}
                       onChangeText={setConfirmPassword}
                       placeholder="Nhập lại mật khẩu mới"
-                      placeholderTextColor={colors.onSurfaceVariant}
+                      placeholderTextColor={colors.onSurfaceVarient}
                       secureTextEntry
                     />
                   </View>
@@ -805,7 +805,7 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                         size={16}
                         color={colors.error}
                       />
-                      <Text style={[ styles.errorText, { color: colors.error } ]}>
+                      <Text style={[styles.errorText, { color: colors.error }]}>
                         {passwordError}
                       </Text>
                     </View>
@@ -850,8 +850,8 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
                   <LinearGradient
                     colors={
                       isDarkMode
-                        ? [ colors.primary, colors.primaryContainer ]
-                        : [ colors.primary, colors.primaryFixed ]
+                        ? [colors.primary, colors.primaryContainer]
+                        : [colors.primary, colors.primaryFixed]
                     }
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
@@ -887,14 +887,14 @@ const EditProfileModal = ({ visible, onClose, colors }) => {
 };
 
 const SettingsModal = ({ visible, onClose, colors }) => {
-  const [ fadeAnim ] = useState(new Animated.Value(0));
-  const [ scaleAnim ] = useState(new Animated.Value(0.8));
-  const [ slideAnim ] = useState(new Animated.Value(0));
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [scaleAnim] = useState(new Animated.Value(0.8));
+  const [slideAnim] = useState(new Animated.Value(0));
   const isDarkMode = useSelector((state) => state.theme.isDarkMode);
   const dispatch = useDispatch();
-  const [ notificationsEnabled, setNotificationsEnabled ] = useState(true);
-  const [ soundEnabled, setSoundEnabled ] = useState(true);
-  const [ language, setLanguage ] = useState("vi");
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [language, setLanguage] = useState("vi");
 
   React.useEffect(() => {
     if (visible) {
@@ -935,7 +935,7 @@ const SettingsModal = ({ visible, onClose, colors }) => {
         }),
       ]).start();
     }
-  }, [ visible ]);
+  }, [visible]);
 
   if (!visible) return null;
 
@@ -956,8 +956,8 @@ const SettingsModal = ({ visible, onClose, colors }) => {
                 { scale: scaleAnim },
                 {
                   translateY: slideAnim.interpolate({
-                    inputRange: [ 0, 1 ],
-                    outputRange: [ 50, 0 ],
+                    inputRange: [0, 1],
+                    outputRange: [50, 0],
                   }),
                 },
               ],
@@ -967,8 +967,8 @@ const SettingsModal = ({ visible, onClose, colors }) => {
           <LinearGradient
             colors={
               isDarkMode
-                ? [ colors.primary, colors.primaryContainer ]
-                : [ colors.primary, colors.primaryFixed ]
+                ? [colors.primary, colors.primaryContainer]
+                : [colors.primary, colors.primaryFixed]
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -977,7 +977,7 @@ const SettingsModal = ({ visible, onClose, colors }) => {
             <View style={styles.modalHeader}>
               <View style={styles.titleContainer}>
                 <FontAwesome5 name="cog" size={24} color={colors.onPrimary} />
-                <Text style={[ styles.modalTitle, { color: colors.onPrimary } ]}>
+                <Text style={[styles.modalTitle, { color: colors.onPrimary }]}>
                   Settings
                 </Text>
               </View>
@@ -1009,7 +1009,7 @@ const SettingsModal = ({ visible, onClose, colors }) => {
                 <View style={styles.settingLeft}>
                   <FontAwesome5 name="moon" size={20} color={colors.primary} />
                   <Text
-                    style={[ styles.settingText, { color: colors.onSurface } ]}
+                    style={[styles.settingText, { color: colors.onSurface }]}
                   >
                     Chế độ tối
                   </Text>
@@ -1028,7 +1028,7 @@ const SettingsModal = ({ visible, onClose, colors }) => {
                 <View style={styles.settingLeft}>
                   <FontAwesome5 name="bell" size={20} color={colors.primary} />
                   <Text
-                    style={[ styles.settingText, { color: colors.onSurface } ]}
+                    style={[styles.settingText, { color: colors.onSurface }]}
                   >
                     Thông báo
                   </Text>
@@ -1051,7 +1051,7 @@ const SettingsModal = ({ visible, onClose, colors }) => {
                     color={colors.primary}
                   />
                   <Text
-                    style={[ styles.settingText, { color: colors.onSurface } ]}
+                    style={[styles.settingText, { color: colors.onSurface }]}
                   >
                     Âm thanh
                   </Text>
@@ -1075,16 +1075,16 @@ const SettingsModal = ({ visible, onClose, colors }) => {
 const SettingsMenu = ({ closeMenu }) => {
   const { colors } = useTheme();
   const { logout, userInfo, switchToAuthFlow } = useContext(AuthContext);
-  const [ userEmail, setUserEmail ] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const isDarkMode = useSelector((state) => state.theme.isDarkMode);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const isMounted = useRef(true);
   const profileFetched = useRef(false);
-  const [ showAboutUs, setShowAboutUs ] = useState(false);
-  const [ showFeedback, setShowFeedback ] = useState(false);
-  const [ showEditProfile, setShowEditProfile ] = useState(false);
-  const [ showSettings, setShowSettings ] = useState(false);
+  const [showAboutUs, setShowAboutUs] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const handleAboutUs = () => {
     closeMenu && closeMenu();
@@ -1131,7 +1131,7 @@ const SettingsMenu = ({ closeMenu }) => {
     };
 
     fetchEmailIfNeeded();
-  }, [ userInfo ]);
+  }, [userInfo]);
 
   const toggleSwitch = () => {
     dispatch(toggleTheme());
@@ -1148,7 +1148,7 @@ const SettingsMenu = ({ closeMenu }) => {
       await logout();
       navigation.reset({
         index: 0,
-        routes: [ { name: "SignIn" } ],
+        routes: [{ name: "SignIn" }],
       });
     } catch (error) {
       console.error("Menu logout error:", error);
@@ -1209,10 +1209,10 @@ const SettingsMenu = ({ closeMenu }) => {
           visible={showEditProfile}
           onClose={() => setShowEditProfile(false)}
           colors={colors}
-        // onUpdate={(updatedInfo) => {
-        //   // Handle profile update
-        //   setUserEmail(updatedInfo.username);
-        // }}
+          // onUpdate={(updatedInfo) => {
+          //   // Handle profile update
+          //   setUserEmail(updatedInfo.username);
+          // }}
         />
 
         <MenuItem
@@ -1267,14 +1267,18 @@ const SettingsMenu = ({ closeMenu }) => {
           <MenuItem
             colors={colors}
             isDarkMode={isDarkMode}
-            text={userInfo?.username || userInfo?.name || 'Người dùng'}
+            text={userInfo?.username || userInfo?.name || "Người dùng"}
             func={() => setShowEditProfile(true)}
-            imageSource={isDarkMode ? require("../../assets/Untitled-1.png") : require("../../assets/default-avatar.png")}
+            imageSource={
+              isDarkMode
+                ? require("../../assets/Untitled-1.png")
+                : require("../../assets/default-avatar.png")
+            }
           />
         )}
 
         {userInfo == null ? (
-          <View style={[ styles.flexRow, styles.flexRowButton ]}>
+          <View style={[styles.flexRow, styles.flexRowButton]}>
             <ButtonPrimary
               text="Sign in"
               textSize={FontSize.labelLargeBold_size}
@@ -1292,7 +1296,7 @@ const SettingsMenu = ({ closeMenu }) => {
             />
           </View>
         ) : (
-          <View style={[ styles.flexRow, styles.flexRowButton ]}>
+          <View style={[styles.flexRow, styles.flexRowButton]}>
             <ButtonPrimary
               text="Logout"
               textSize={FontSize.labelLargeBold_size}
@@ -1309,9 +1313,9 @@ const SettingsMenu = ({ closeMenu }) => {
 
 const MenuItem = ({ colors, imageSource, text, func }) => {
   return (
-    <Pressable onPress={func} style={[ styles.menuItem, styles.flexRow ]}>
+    <Pressable onPress={func} style={[styles.menuItem, styles.flexRow]}>
       <Image style={styles.menuItemImage} source={imageSource} />
-      <Text style={[ styles.menuItemText, { color: colors.onSurface } ]}>
+      <Text style={[styles.menuItemText, { color: colors.onSurface }]}>
         {text}
       </Text>
     </Pressable>
