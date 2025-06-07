@@ -9,12 +9,8 @@ import MyFlatList from "../../components/MyFlatList";
 import ButtonPrimary from "../../components/button/ButtonPrimary";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../GlobalStyles";
 import { AuthContext } from "../../context/authContext";
-
-// Disable console errors in production to prevent error overlays
-if (!__DEV__) {
-    console.error = () => {};
-    console.warn = () => {};
-}
+import ConfirmModal from "../../components/modal/ConfirmModal";
+import SuccessModal from "../../components/modal/SuccessModal";
 
 const Cart = () => {
     const navigation = useNavigation();
@@ -24,38 +20,8 @@ const Cart = () => {
     const [ cartItems, setCartItems ] = useState([]);
     const [ numberOfProduct, setNumberOfProduct ] = useState(0);
     const [ totalPrice, setTotalPrice ] = useState(0);
-
-    // Global error handler to suppress all unhandled errors
-    useEffect(() => {
-        const originalConsoleError = console.error;
-        const originalConsoleWarn = console.warn;
-
-        // Override console methods to suppress axios errors
-        console.error = (...args) => {
-            const message = args.join(' ');
-            if (message.includes('Request failed with status code') ||
-                message.includes('AxiosError') ||
-                message.includes('Network Error')) {
-                return; // Suppress axios errors
-            }
-            originalConsoleError.apply(console, args);
-        };
-
-        console.warn = (...args) => {
-            const message = args.join(' ');
-            if (message.includes('Request failed with status code') ||
-                message.includes('AxiosError') ||
-                message.includes('Network Error')) {
-                return; // Suppress axios warnings
-            }
-            originalConsoleWarn.apply(console, args);
-        };
-
-        return () => {
-            console.error = originalConsoleError;
-            console.warn = originalConsoleWarn;
-        };
-    }, []);
+    const [ showConfirmModal, setShowConfirmModal ] = useState(false);
+    const [ showSuccessModal, setShowSuccessModal ] = useState(false);
 
     // Redirect to login if not authenticated
     useEffect(() => {
@@ -68,47 +34,32 @@ const Cart = () => {
                 ]
             );
         }
-    }, [isGuest]);
+    }, [ isGuest ]);
 
     const getCartItems = async () => {
         if (!accessToken) return;
 
         setLoading(true);
         try {
-            // Create axios instance with custom error handling
-            const axiosInstance = axios.create({
-                timeout: 10000,
-                validateStatus: function (status) {
-                    // Consider any status code less than 600 as success to prevent throwing
-                    return status < 600;
-                }
-            });
-
-            const response = await axiosInstance.get(`${backendUrl}/cart`, {
+            const response = await axios.get(`${backendUrl}/cart`, {
                 headers: { 'x-access-token': accessToken }
             });
 
-            // Check if response is successful
-            if (response.status === 200 && response.data) {
-                // Transform the cart items to match the expected format
-                const formattedCartItems = (response.data || []).map(cartItem => ({
-                    id: cartItem?.id || 0,
-                    title: cartItem?.item?.name || 'Unknown Product',
-                    description: cartItem?.item?.description || '',
-                    image_url: cartItem?.item?.image_url || '',
-                    max_current_price: cartItem?.item?.price || 0,
-                    amount: cartItem?.quantity || 1,
-                    item_id: cartItem?.item_id || 0
-                })).filter(item => item.id !== 0); // Filter out invalid items
+            // Transform the cart items to match the expected format
+            const formattedCartItems = response.data.map(cartItem => ({
+                id: cartItem.id,
+                title: cartItem.item.name,
+                description: cartItem.item.description,
+                image_url: cartItem.item.image_url,
+                max_current_price: cartItem.item.price,
+                amount: cartItem.quantity,
+                item_id: cartItem.item_id
+            }));
 
-                setCartItems(formattedCartItems);
-            } else {
-                // Handle non-200 responses silently
-                setCartItems([]);
-            }
+            setCartItems(formattedCartItems);
         } catch (error) {
-            // Completely suppress all error logging and handling
-            setCartItems([]);
+            console.error("Error fetching cart items:", error);
+            Alert.alert("Error", "Failed to load cart items");
         } finally {
             setLoading(false);
         }
@@ -120,51 +71,29 @@ const Cart = () => {
     };
 
     const updateCart = () => {
-        try {
-            const count = cartItems.reduce((count, item) => {
-                const amount = parseInt(item?.amount) || 0;
-                return count + amount;
-            }, 0);
+        const count = cartItems.reduce((count, item) => count += parseInt(item.amount), 0);
+        const total = Math.round(100 * cartItems.reduce((sum, item) => sum + item.max_current_price * item.amount, 0)) / 100;
 
-            const total = Math.round(100 * cartItems.reduce((sum, item) => {
-                const price = parseFloat(item?.max_current_price) || 0;
-                const amount = parseInt(item?.amount) || 0;
-                return sum + (price * amount);
-            }, 0)) / 100;
-
-            setNumberOfProduct(count);
-            setTotalPrice(total);
-        } catch (error) {
-            console.error("Error updating cart totals:", error);
-            setNumberOfProduct(0);
-            setTotalPrice(0);
-        }
+        setNumberOfProduct(count);
+        setTotalPrice(total);
     }
 
     useEffect(() => {
         if (accessToken) {
             getCartItems();
         }
-    }, [accessToken]);
+    }, [ accessToken ]);
 
     useEffect(() => {
         updateCart();
-    }, [cartItems]);
+    }, [ cartItems ]);
 
     const handleAmountChange = async (id, newAmount) => {
         if (!accessToken) return;
 
         try {
-            // Create axios instance with custom error handling
-            const axiosInstance = axios.create({
-                timeout: 10000,
-                validateStatus: function (status) {
-                    return status < 600;
-                }
-            });
-
             // Update the cart item quantity in the backend
-            await axiosInstance.put(`${backendUrl}/cart/${id}`,
+            await axios.put(`${backendUrl}/cart/${id}`,
                 { quantity: newAmount },
                 { headers: { 'x-access-token': accessToken } }
             );
@@ -176,7 +105,8 @@ const Cart = () => {
                 )
             );
         } catch (error) {
-            // Completely suppress error
+            console.error("Error updating cart item:", error);
+            Alert.alert("Error", "Failed to update cart item");
         }
     }
 
@@ -186,119 +116,123 @@ const Cart = () => {
     }
 
     const renderItem = ({ item }) => {
-        try {
-            if (!item || !item.id) {
-                return null;
-            }
-
-            return (
-                <ProductCart key={item.id}
-                    id={item.id}
-                    title={item.title || 'Unknown Product'}
-                    text={"Product"}
-                    price={item.max_current_price || 0}
-                    image={item.image_url || ''}
-                    amount={item.amount || 1}
-                    onAmoutChange={handleAmountChange}
-                    onDelete={handleDeleteItem}
-                >
-                </ProductCart>
-            )
-        } catch (error) {
-            console.error("Error rendering cart item:", error);
-            return null;
-        }
+        return (
+            <ProductCart key={item.id}
+                id={item.id}
+                title={item.title}
+                text={"Product"}
+                price={item.max_current_price}
+                image={item.image_url}
+                amount={item.amount}
+                onAmoutChange={handleAmountChange}
+                onDelete={handleDeleteItem}
+            >
+            </ProductCart>
+        )
     }
 
     const handleClearCart = async () => {
         if (!accessToken) return;
 
         try {
-            // Create axios instance with custom error handling
-            const axiosInstance = axios.create({
-                timeout: 10000,
-                validateStatus: function (status) {
-                    return status < 600;
-                }
-            });
-
-            await axiosInstance.delete(`${backendUrl}/cart`, {
+            await axios.delete(`${backendUrl}/cart`, {
                 headers: { 'x-access-token': accessToken }
             });
 
             setCartItems([]);
-            // Remove success alert - just clear silently
+            setShowConfirmModal(false);
+            setShowSuccessModal(true);
         } catch (error) {
-            // Completely suppress error
+            console.error("Error clearing cart:", error);
+            Alert.alert("Error", "Failed to clear cart");
         }
     };
 
-            return (
-                <View style={{ flex: 1, position: 'relative' }}>
-                    {isLoading ? (
-                        <ActivityIndicator />
-                    ) : (
-                        <>
-                            <Dashboard namePage={"Carts"}>
-                                <View style={{ height: "100%", }}>
-                                    {cartItems.length === 0 ? (
-                                        <View style={styles.emptyCartContainer}>
-                                            <Text style={[styles.emptyCartText, { color: colors.onSurface }]}>
-                                                Your cart is empty
-                                            </Text>
-                                            <ButtonPrimary
-                                                text={"Go Shopping"}
-                                                buttonPrimaryMarginTop={20}
-                                                onPressButton={() => navigation.navigate("Home", {
-                                                    screen: "Shopping",
-                                                    params: { screen: "ShoppingScreen" }
-                                                })}
-                                            />
-                                        </View>
-                                    ) : (
-                                        <MyFlatList
-                                            data={cartItems}
-                                            renderItem={renderItem}
-                                            isLoading={isLoading}
-                                            handleLoading={handleLoading}
-                                            renderPaginationButtons={() => <View style={{ paddingBottom: 400 }}></View>}
-                                        />
-                                    )}
+    // Add to the styles object
+    return (
+        <View style={{ flex: 1, position: 'relative' }}>
+            {isLoading ? (
+                <ActivityIndicator />
+            ) : (
+                <>
+                    <Dashboard namePage={"Carts"}>
+                        <View style={{ height: "100%", }}>
+                            {cartItems.length === 0 ? (
+                                <View style={styles.emptyCartContainer}>
+                                    <Text style={[ styles.emptyCartText, { color: colors.onSurface } ]}>
+                                        Your cart is empty
+                                    </Text>
+                                    <ButtonPrimary
+                                        text={"Go Shopping"}
+                                        buttonPrimaryMarginTop={20}
+                                        onPressButton={() => navigation.navigate("Home", {
+                                            screen: "Shopping",
+                                            params: { screen: "ShoppingScreen" }
+                                        })}
+                                    />
                                 </View>
-                            </Dashboard>
-
-                            {cartItems.length > 0 && (
-                                <View style={styles.bottomWrapper}>
-                                    <View style={[ styles.totalContainer, { backgroundColor: colors.surfaceContainerHigh, shadowColor: colors.primaryShadow } ]}>
-                                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                            <Text style={styles.text1}>Number of products</Text>
-                                            <Text style={[ styles.text1, { color: colors.onSurface } ]}>{numberOfProduct}</Text>
-                                        </View>
-                                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
-                                            <Text style={styles.text2}>Total</Text>
-                                            <Text style={[ styles.text2, { color: colors.onSurface } ]}>${totalPrice}</Text>
-                                        </View>
-                                        <View style={styles.buttonContainer}>
-                                            <ButtonPrimary
-                                                text={"Clear Cart"}
-                                                buttonPrimaryMarginTop={30}
-                                                buttonPrimaryBackgroundColor={Color.colorRed}
-                                                onPressButton={handleClearCart}
-                                            />
-                                            <ButtonPrimary
-                                                text={"Pay now"}
-                                                buttonPrimaryMarginTop={30}
-                                                onPressButton={() => navigation.navigate("Payment", { Amount: numberOfProduct, Price: totalPrice })}
-                                            />
-                                        </View>
-                                    </View>
-                                </View>
+                            ) : (
+                                <MyFlatList
+                                    data={cartItems}
+                                    renderItem={renderItem}
+                                    isLoading={isLoading}
+                                    handleLoading={handleLoading}
+                                    renderPaginationButtons={() => <View style={{ paddingBottom: 400 }}></View>}
+                                />
                             )}
-                        </>
+                        </View>
+                    </Dashboard>
+
+                    {cartItems.length > 0 && (
+                        <View style={styles.bottomWrapper}>
+                            <View style={[ styles.totalContainer, { backgroundColor: colors.surfaceContainerHigh, shadowColor: colors.primaryShadow } ]}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                                    <Text style={styles.text1}>Number of products</Text>
+                                    <Text style={[ styles.text1, { color: colors.onSurface } ]}>{numberOfProduct}</Text>
+                                </View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
+                                    <Text style={styles.text2}>Total</Text>
+                                    <Text style={[ styles.text2, { color: colors.onSurface } ]}>${totalPrice}</Text>
+                                </View>
+                                <View style={styles.buttonContainer}>
+                                    <ButtonPrimary
+                                        text={"Clear Cart"}
+                                        buttonPrimaryMarginTop={30}
+                                        buttonPrimaryBackgroundColor={Color.colorRed}
+                                        onPressButton={() => setShowConfirmModal(true)}
+                                    />
+                                    <ButtonPrimary
+                                        text={"Pay now"}
+                                        buttonPrimaryMarginTop={30}
+                                        onPressButton={() => navigation.navigate("Payment", { Amount: numberOfProduct, Price: totalPrice })}
+                                    />
+                                </View>
+                            </View>
+                        </View>
                     )}
-                </View>
-            );
-       
+                </>
+            )}
+            
+            <ConfirmModal
+                visible={showConfirmModal}
+                onClose={() => setShowConfirmModal(false)}
+                onConfirm={handleClearCart}
+                title="Clear Cart"
+                message="Are you sure you want to remove all items from your cart? This action cannot be undone."
+                confirmText="Clear Cart"
+                cancelText="Cancel"
+                confirmColor="#FF4444"
+            />
+            
+            <SuccessModal
+                visible={showSuccessModal}
+                onClose={() => setShowSuccessModal(false)}
+                title="Cart Cleared"
+                message="All items have been successfully removed from your cart."
+                buttonText="Continue Shopping"
+            />
+        </View>
+    );
 }
 
 
