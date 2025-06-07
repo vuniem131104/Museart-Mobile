@@ -34,7 +34,7 @@ const Cart = () => {
                 ]
             );
         }
-    }, [isGuest]);
+    }, [ isGuest ]);
 
     const getCartItems = async () => {
         if (!accessToken) return;
@@ -82,11 +82,11 @@ const Cart = () => {
         if (accessToken) {
             getCartItems();
         }
-    }, [accessToken]);
+    }, [ accessToken ]);
 
     useEffect(() => {
         updateCart();
-    }, [cartItems]);
+    }, [ cartItems ]);
 
     const handleAmountChange = async (id, newAmount) => {
         if (!accessToken) return;
@@ -159,7 +159,7 @@ const Cart = () => {
                         <View style={{ height: "100%", }}>
                             {cartItems.length === 0 ? (
                                 <View style={styles.emptyCartContainer}>
-                                    <Text style={[styles.emptyCartText, { color: colors.onSurface }]}>
+                                    <Text style={[ styles.emptyCartText, { color: colors.onSurface } ]}>
                                         Your cart is empty
                                     </Text>
                                     <ButtonPrimary
@@ -219,18 +219,18 @@ const Cart = () => {
                 onConfirm={handleClearCart}
                 title="Clear Cart"
                 message="Are you sure you want to remove all items from your cart? This action cannot be undone."
-                confirmText="Yes"
+                confirmText="Clear Cart"
                 cancelText="Cancel"
                 confirmColor="#FF4444"
             />
             
-            {/* <SuccessModal
+            <SuccessModal
                 visible={showSuccessModal}
                 onClose={() => setShowSuccessModal(false)}
                 title="Cart Cleared"
                 message="All items have been successfully removed from your cart."
                 buttonText="Continue Shopping"
-            /> */}
+            />
         </View>
     );
 }

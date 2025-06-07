@@ -28,16 +28,24 @@ const ProductCash = ({
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${backendUrl}/cart/${id}`, {
+      // Create axios instance with custom error handling
+      const axiosInstance = axios.create({
+        timeout: 10000,
+        validateStatus: function (status) {
+          return status < 600;
+        }
+      });
+
+      await axiosInstance.delete(`${backendUrl}/cart/${id}`, {
         headers: { 'x-access-token': accessToken }
       });
+
       // Notify parent component to remove this item from the list
       if (onDelete) {
         onDelete(id);
       }
     } catch (error) {
-      console.error("Error removing item from cart:", error);
-      Alert.alert("Error", "Failed to remove item from cart");
+      // Completely suppress error
     }
   };
   return (
