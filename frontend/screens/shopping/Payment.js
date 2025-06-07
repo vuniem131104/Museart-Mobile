@@ -1,18 +1,21 @@
 import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, Image, Modal, Pressable } from "react-native";
+import React, { useState, useContext } from "react";
+import { View, Text, StyleSheet, TextInput, Image, Modal, Pressable, Alert, ActivityIndicator } from "react-native";
 import { Color, Border, Padding, FontSize, FontFamily } from "../../GlobalStyles";
 import NavbarTop from "../../components/header/NavbarTop";
 import ButtonPrimary from "../../components/button/ButtonPrimary";
 import NotificationSuccess from "../../components/notification/NotificationSuccess";
 import NotificationFailed from "../../components/notification/NotificationFailed";
+import VNPayWebView from "../../components/payment/VNPayWebView";
+import axios from "axios";
+import { backendUrl } from "../../services/api";
+import { AuthContext } from "../../context/authContext";
 
 const Payment = () => {
-
     const navigation = useNavigation();
-
     const { colors } = useTheme();
     const route = useRoute();
+    const { accessToken } = useContext(AuthContext);
 
     const { Amount, Price } = route.params;
     const [ name, setName ] = useState("");
@@ -22,8 +25,74 @@ const Payment = () => {
     const [ address, setAddress ] = useState("");
     const [ payMethod, setPayMethod ] = useState(0);
     const [ success, setSuccess ] = useState(0);
+    const [ showVNPay, setShowVNPay ] = useState(false);
+    const [ vnpayUrl, setVnpayUrl ] = useState("");
+    const [ isLoading, setIsLoading ] = useState(false);
+
     const checkValid = () => {
         return name != "" && numberPhone != "" && ward != "" && province != "" && address != "" && payMethod != 0;
+    }
+
+    const handleVNPayPayment = async () => {
+        if (!checkValid()) {
+            setSuccess(-1);
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            console.log("Making payment request to:", `${backendUrl}/payment/create-payment`);
+            console.log("With access token:", accessToken ? "Token exists" : "No token");
+
+            // Create payment URL - amount is fixed at 10,000 VND on the server
+            const response = await axios.post(
+                `${backendUrl}/payment/create-payment`,
+                {
+                    amount: 5000, // This value is fixed on the server
+                    orderInfo: `Payment for ${Amount} items`,
+                    returnUrl: `${backendUrl}/payment/vnpay-return`
+                },
+                {
+                    headers: { 'x-access-token': accessToken },
+                    timeout: 10000 // 10 second timeout
+                }
+            );
+
+            console.log("Payment response:", response.data);
+
+            if (response.data && response.data.paymentUrl) {
+                setVnpayUrl(response.data.paymentUrl);
+                setShowVNPay(true);
+            } else {
+                Alert.alert("Error", "Failed to generate payment URL");
+            }
+        } catch (error) {
+            console.error("Error creating VNPay payment:", error);
+
+            // More detailed error message
+            let errorMessage = "Failed to initiate payment";
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                errorMessage = `Server error: ${error.response.status} - ${error.response.data.message || "Unknown error"}`;
+                console.log("Error response data:", error.response.data);
+            } else if (error.request) {
+                // The request was made but no response was received
+                errorMessage = "No response from server. Please check your network connection.";
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                errorMessage = `Request error: ${error.message}`;
+            }
+
+            Alert.alert("Payment Error", errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const handlePaymentComplete = (isSuccessful, message) => {
+        setShowVNPay(false);
+        setSuccess(isSuccessful ? 1 : -1);
     }
     return (
         <View style={[ styles.paymentContainer, { backgroundColor: colors.surfaceContainer } ]}>
@@ -114,13 +183,15 @@ const Payment = () => {
                             flexDirection: "row",
                             flexWrap: "wrap",
                             justifyContent: "space-between",
-                            gap: 10, // Nếu chưa hỗ trợ `gap`, dùng `marginBottom`
+                            gap: 10,
                         }}>
                             <View style={{ width: "48%" }}>
                                 <ButtonPrimary
                                     image={require("../../assets/frame.png")}
+                                    imageStyle={{ width: 80, height: 30, resizeMode: 'contain' }}
                                     buttonPrimaryBackgroundColor={colors.surfaceContainerHighest}
                                     buttonPrimaryBorderWidth={payMethod === 1 ? 2 : 0}
+                                    buttonPrimaryPaddingVertical={15}
                                     onPressButton={() => setPayMethod(1)}
                                 />
                             </View>
@@ -128,17 +199,21 @@ const Payment = () => {
                             <View style={{ width: "48%" }}>
                                 <ButtonPrimary
                                     image={require("../../assets/frame1.png")}
+                                    imageStyle={{ width: 80, height: 30, resizeMode: 'contain' }}
                                     buttonPrimaryBackgroundColor={colors.surfaceContainerHighest}
                                     buttonPrimaryBorderWidth={payMethod === 2 ? 2 : 0}
+                                    buttonPrimaryPaddingVertical={15}
                                     onPressButton={() => setPayMethod(2)}
                                 />
                             </View>
 
                             <View style={{ width: "48%" }}>
                                 <ButtonPrimary
-                                    image={require("../../assets/frame2.png")}
+                                    image={require("../../assets/vnpay-logo.png")}
+                                    imageStyle={{ width: 80, height: 30, resizeMode: 'contain' }}
                                     buttonPrimaryBackgroundColor={colors.surfaceContainerHighest}
                                     buttonPrimaryBorderWidth={payMethod === 3 ? 2 : 0}
+                                    buttonPrimaryPaddingVertical={15}
                                     onPressButton={() => setPayMethod(3)}
                                 />
                             </View>
@@ -146,29 +221,15 @@ const Payment = () => {
                             <View style={{ width: "48%" }}>
                                 <ButtonPrimary
                                     image={require("../../assets/frame2.png")}
+                                    imageStyle={{ width: 80, height: 30, resizeMode: 'contain' }}
                                     buttonPrimaryBackgroundColor={colors.surfaceContainerHighest}
                                     buttonPrimaryBorderWidth={payMethod === 4 ? 2 : 0}
+                                    buttonPrimaryPaddingVertical={15}
                                     onPressButton={() => setPayMethod(4)}
                                 />
                             </View>
 
-                            <View style={{ width: "48%" }}>
-                                <ButtonPrimary
-                                    image={require("../../assets/frame2.png")}
-                                    buttonPrimaryBackgroundColor={colors.surfaceContainerHighest}
-                                    buttonPrimaryBorderWidth={payMethod === 5 ? 2 : 0}
-                                    onPressButton={() => setPayMethod(5)}
-                                />
-                            </View>
 
-                            <View style={{ width: "48%" }}>
-                                <ButtonPrimary
-                                    image={require("../../assets/frame2.png")}
-                                    buttonPrimaryBackgroundColor={colors.surfaceContainerHighest}
-                                    buttonPrimaryBorderWidth={payMethod === 6 ? 2 : 0}
-                                    onPressButton={() => setPayMethod(6)}
-                                />
-                            </View>
                         </View>
 
                     </View>
@@ -187,7 +248,13 @@ const Payment = () => {
                                 buttonPrimaryFlex={1}
                                 buttonPrimaryMarginLeft={15}
                                 onPressButton={() => {
-                                    checkValid() ? setSuccess(1) : setSuccess(-1);
+                                    if (payMethod === 3) {
+                                        // VNPay payment
+                                        handleVNPayPayment();
+                                    } else {
+                                        // Regular payment
+                                        checkValid() ? setSuccess(1) : setSuccess(-1);
+                                    }
                                 }}
                             />
                         </View>
@@ -203,8 +270,27 @@ const Payment = () => {
                         </Pressable>
                     </View>
                 </Modal>
+
+                {/* VNPay WebView Modal */}
+                {showVNPay && vnpayUrl && (
+                    <Modal visible={showVNPay} animationType="slide" transparent={false}>
+                        <VNPayWebView
+                            paymentUrl={vnpayUrl}
+                            onClose={() => setShowVNPay(false)}
+                            onPaymentComplete={handlePaymentComplete}
+                        />
+                    </Modal>
+                )}
             </View>
 
+            {isLoading && (
+                <View style={styles.loadingOverlay}>
+                    <ActivityIndicator size="large" color={colors.primary} />
+                    <Text style={[styles.loadingText, { color: colors.onSurface }]}>
+                        Processing payment...
+                    </Text>
+                </View>
+            )}
         </View>
     );
 };
@@ -270,6 +356,23 @@ const styles = StyleSheet.create({
         color: Color.surfaceOnSurfaceVarient,
         textAlign: "left",
         marginLeft: 5,
+    },
+    loadingOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        zIndex: 1000,
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: FontSize.labelLargeBold_size,
+        fontFamily: FontFamily.typographyLabelLarge,
+        color: '#FFFFFF',
     }
 })
 

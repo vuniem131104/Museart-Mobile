@@ -115,9 +115,15 @@ const ArtworkDetail = () => {
             />
           </View>
           <View style={styles.descriptioncontainerFlexBox}>
-            {/* <Text style={[styles.description, styles.descriptionFlexBox, { color: colors.onSurface }]}>
-                            Description
-                        </Text> */}
+            {/* <Text
+              style={[
+                styles.description,
+                styles.descriptionFlexBox,
+                { color: colors.onSurface },
+              ]}
+            >
+              Description
+            </Text> */}
             <View>
               <Text
                 style={[
@@ -163,6 +169,7 @@ const ArtworkDetail = () => {
                   fontSize: 16,
                   textAlign: "justify",
                   alignSelf: "stretch",
+                  color: colors.onSurface,
                 }}
               >
                 {artwork.provenance_text ||
@@ -185,6 +192,7 @@ const ArtworkDetail = () => {
                   fontSize: 16,
                   textAlign: "justify",
                   alignSelf: "stretch",
+                  color: colors.onSurface,
                 }}
               >
                 {artwork.medium_display || "No medium information provided."}
@@ -206,6 +214,7 @@ const ArtworkDetail = () => {
                   fontSize: 16,
                   textAlign: "justify",
                   alignSelf: "stretch",
+                  color: colors.onSurface,
                 }}
               >
                 {artwork.publication_history_text ||

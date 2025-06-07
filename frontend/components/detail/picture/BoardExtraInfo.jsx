@@ -43,7 +43,6 @@ const BoardExtraInfo = ({ date, id, type }) => {
       if (userInfo) {
         const checkReaction = await axios.get(
           `${backendUrl}/${type}/${id}/check-reaction`
-          // { headers: { Authorization: `${userInfo.token}` } }
         );
         setIsLiked(checkReaction.data.hasReacted);
       }
@@ -56,7 +55,6 @@ const BoardExtraInfo = ({ date, id, type }) => {
     try {
       const response = await axios.get(`${backendUrl}/${type}/${id}/comments`);
       setComments(response.data);
-      console.log(response);
     } catch (error) {
       console.error(error);
     }
@@ -67,19 +65,19 @@ const BoardExtraInfo = ({ date, id, type }) => {
       navigation.navigate("Login");
       return;
     }
-    console.log(userInfo);
+    // console.log(userInfo);
+
+    setIsLiked(!isLiked);
+    setLikeAmount((prev) => (isLiked ? prev - 1 : prev + 1));
+
     try {
       await axios.post(`${backendUrl}/${type}/${id}/reactions`, {
         type: "like",
       });
-      if (isLiked) {
-        setLikeAmount((prev) => prev - 1);
-      } else {
-        setLikeAmount((prev) => prev + 1);
-      }
-      setIsLiked(!isLiked);
     } catch (error) {
       console.error("Error handling like:", error);
+      setIsLiked(!isLiked);
+      setLikeAmount((prev) => (isLiked ? prev + 1 : prev - 1));
     }
   };
 
@@ -105,7 +103,7 @@ const BoardExtraInfo = ({ date, id, type }) => {
     <View style={[styles.boardExtraInfoArtwork]}>
       <View style={styles.frameParent}>
         <View style={styles.commentParent}>
-          <Text style={[styles.comment, styles.textTypo]}>Comment</Text>
+          {/* <Text style={[styles.comment, styles.textTypo]}>Comment</Text> */}
           <TouchableOpacity
             style={styles.iconContainer}
             onPress={() => setModalVisible(true)}
@@ -141,14 +139,13 @@ const BoardExtraInfo = ({ date, id, type }) => {
         </View>
 
         <View style={styles.commentParent}>
-          <Text style={[styles.comment, styles.textTypo]}>
+          {/* <Text style={[styles.comment, styles.textTypo]}>
             {isLiked ? "Liked" : "Like"}
-          </Text>
-          <TouchableOpacity
-            style={styles.iconContainer}
-            onPress={handleLike}
-          >
-            <View style={[styles.iconWrapper, isLiked && styles.likedIconWrapper]}>
+          </Text> */}
+          <TouchableOpacity style={styles.iconContainer} onPress={handleLike}>
+            <View
+              style={[styles.iconWrapper, isLiked && styles.likedIconWrapper]}
+            >
               <Image
                 style={[styles.frameChild, isLiked && styles.likedIcon]}
                 contentFit="cover"
@@ -168,7 +165,7 @@ const BoardExtraInfo = ({ date, id, type }) => {
         </View>
 
         <View style={styles.commentParent}>
-          <Text style={[styles.comment, styles.textTypo]}>Last Updated</Text>
+          {/* <Text style={[styles.comment, styles.textTypo]}>Last Updated</Text> */}
           <View style={styles.iconContainer}>
             <View style={styles.iconWrapper}>
               <Image
@@ -207,7 +204,6 @@ const styles = StyleSheet.create({
     minWidth: 30, // Ensure consistent width for numbers
   },
   iconContainer: {
-    marginTop: 10,
     flexDirection: "row",
     alignItems: "center",
     height: 40, // Fixed height for all icon containers
@@ -224,13 +220,11 @@ const styles = StyleSheet.create({
   },
   commentParent: {
     alignItems: "center",
-    width: "30%", // Ensure equal width for all three columns
   },
   frameParent: {
     alignSelf: "stretch",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     flexDirection: "row",
-    width: "100%",
   },
   boardExtraInfoArtwork: {
     shadowColor: "rgba(0, 0, 0, 0.25)",
@@ -244,11 +238,11 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_3xs,
     backgroundColor: Color.colorGray_300, // Darker background for better contrast
     overflow: "hidden",
-    paddingHorizontal: Padding.p_xl,
+    paddingHorizontal: Padding.p_mini,
     paddingVertical: Padding.p_mini,
     alignItems: "center",
     alignSelf: "stretch",
-    marginTop: 2, // Add a small gap between image and info box
+    marginTop: Padding.p_3xs, // Add a small gap between image and info box
   },
   loadingContainer: {
     justifyContent: "center",

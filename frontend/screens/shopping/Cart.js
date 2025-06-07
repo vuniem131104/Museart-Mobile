@@ -1,34 +1,65 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigation, useTheme } from "@react-navigation/native"
-import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from "react-native";
 import axios from "axios";
-import { baseUrl } from "../../services/api";
+import { baseUrl, backendUrl } from "../../services/api";
 import Dashboard from "../../components/header/Dashboard";
 import ProductCart from "../../components/product/ProductCart";
 import MyFlatList from "../../components/MyFlatList";
 import ButtonPrimary from "../../components/button/ButtonPrimary";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../GlobalStyles";
+import { AuthContext } from "../../context/authContext";
+import ConfirmModal from "../../components/modal/ConfirmModal";
+import SuccessModal from "../../components/modal/SuccessModal";
 
 const Cart = () => {
     const navigation = useNavigation();
     const { colors } = useTheme();
+    const { accessToken, isGuest } = useContext(AuthContext);
     const [ isLoading, setLoading ] = useState(false);
-    const [ products, setProducts ] = useState([]);
-    //pagination
-    const [ page, setPage ] = useState(1);
+    const [ cartItems, setCartItems ] = useState([]);
     const [ numberOfProduct, setNumberOfProduct ] = useState(0);
     const [ totalPrice, setTotalPrice ] = useState(0);
+    const [ showConfirmModal, setShowConfirmModal ] = useState(false);
+    const [ showSuccessModal, setShowSuccessModal ] = useState(false);
 
-    const getProducts = async () => {
+    // Redirect to login if not authenticated
+    useEffect(() => {
+        if (isGuest) {
+            Alert.alert(
+                "Authentication Required",
+                "Please sign in to view your cart",
+                [
+                    { text: "OK", onPress: () => navigation.navigate("SignIn") }
+                ]
+            );
+        }
+    }, [ isGuest ]);
+
+    const getCartItems = async () => {
+        if (!accessToken) return;
+
         setLoading(true);
         try {
-            const response = await axios.get(`${baseUrl}/products?page=${page}`);
-            const firstFiveProducts = response.data.data.slice(0, 10);
-            const productsWithAmount = firstFiveProducts.map(item => ({ ...item, amount: 1 }));
-            setProducts(productsWithAmount);
-            setLoading(false);
+            const response = await axios.get(`${backendUrl}/cart`, {
+                headers: { 'x-access-token': accessToken }
+            });
+
+            // Transform the cart items to match the expected format
+            const formattedCartItems = response.data.map(cartItem => ({
+                id: cartItem.id,
+                title: cartItem.item.name,
+                description: cartItem.item.description,
+                image_url: cartItem.item.image_url,
+                max_current_price: cartItem.item.price,
+                amount: cartItem.quantity,
+                item_id: cartItem.item_id
+            }));
+
+            setCartItems(formattedCartItems);
         } catch (error) {
-            console.error(error);
+            console.error("Error fetching cart items:", error);
+            Alert.alert("Error", "Failed to load cart items");
         } finally {
             setLoading(false);
         }
@@ -39,60 +70,49 @@ const Cart = () => {
         setTimeout(() => setLoading(false), 1000);
     };
 
-    const loadMore = (p) => setPage(p);
-
-    const renderPaginationButtons = () => {
-        const maxButtonsToShow = 5;
-        let startPage = Math.max(1, page - Math.floor(maxButtonsToShow / 2));
-        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-
-        if (endPage - startPage + 1 < maxButtonsToShow) {
-            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
-        }
-
-        const buttons = [];
-
-        for (let i = startPage; i <= endPage; i++) {
-            buttons.push(
-                <TouchableOpacity
-                    key={i}
-                    onPress={() => loadMore(i)}
-                    style={[
-                        styles.paginationButton,
-                        i === page ? styles.activeButton : null,
-                    ]}>
-                    <Text style={{ color: 'white' }}>{i}</Text>
-                </TouchableOpacity>,
-            );
-        }
-
-        return buttons;
-    };
-
     const updateCart = () => {
-        const count = products.reduce((count, item) => count += parseInt(item.amount), 0);
-        const total = Math.round(100 * products.reduce((sum, item) => sum + item.max_current_price * item.amount, 0)) / 100;
+        const count = cartItems.reduce((count, item) => count += parseInt(item.amount), 0);
+        const total = Math.round(100 * cartItems.reduce((sum, item) => sum + item.max_current_price * item.amount, 0)) / 100;
 
         setNumberOfProduct(count);
         setTotalPrice(total);
     }
 
     useEffect(() => {
-        getProducts();
-    }, [ page ]);
+        if (accessToken) {
+            getCartItems();
+        }
+    }, [ accessToken ]);
 
     useEffect(() => {
         updateCart();
-    }, [ products ]);
+    }, [ cartItems ]);
 
-    const handleAmountChange = (id, newAmount) => {
-        setProducts((prevProducts) =>
-            prevProducts.map((product) =>
-                product.id === id ? { ...product, amount: newAmount } : product
-            )
-        );
-        updateCart();
+    const handleAmountChange = async (id, newAmount) => {
+        if (!accessToken) return;
 
+        try {
+            // Update the cart item quantity in the backend
+            await axios.put(`${backendUrl}/cart/${id}`,
+                { quantity: newAmount },
+                { headers: { 'x-access-token': accessToken } }
+            );
+
+            // Update local state
+            setCartItems((prevItems) =>
+                prevItems.map((item) =>
+                    item.id === id ? { ...item, amount: newAmount } : item
+                )
+            );
+        } catch (error) {
+            console.error("Error updating cart item:", error);
+            Alert.alert("Error", "Failed to update cart item");
+        }
+    }
+
+    const handleDeleteItem = (id) => {
+        // Remove the item from local state after successful deletion
+        setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
     }
 
     const renderItem = ({ item }) => {
@@ -105,10 +125,28 @@ const Cart = () => {
                 image={item.image_url}
                 amount={item.amount}
                 onAmoutChange={handleAmountChange}
+                onDelete={handleDeleteItem}
             >
             </ProductCart>
         )
     }
+
+    const handleClearCart = async () => {
+        if (!accessToken) return;
+
+        try {
+            await axios.delete(`${backendUrl}/cart`, {
+                headers: { 'x-access-token': accessToken }
+            });
+
+            setCartItems([]);
+            setShowConfirmModal(false);
+            setShowSuccessModal(true);
+        } catch (error) {
+            console.error("Error clearing cart:", error);
+            Alert.alert("Error", "Failed to clear cart");
+        }
+    };
 
     // Add to the styles object
     return (
@@ -119,35 +157,80 @@ const Cart = () => {
                 <>
                     <Dashboard namePage={"Carts"}>
                         <View style={{ height: "100%", }}>
-                            <MyFlatList
-                                data={products}
-                                renderItem={renderItem}
-                                isLoading={isLoading}
-                                handleLoading={handleLoading}
-                                renderPaginationButtons={() => <View style={{ paddingBottom: 400 }}></View>}
-                            />
+                            {cartItems.length === 0 ? (
+                                <View style={styles.emptyCartContainer}>
+                                    <Text style={[ styles.emptyCartText, { color: colors.onSurface } ]}>
+                                        Your cart is empty
+                                    </Text>
+                                    <ButtonPrimary
+                                        text={"Go Shopping"}
+                                        buttonPrimaryMarginTop={20}
+                                        onPressButton={() => navigation.navigate("Home", {
+                                            screen: "Shopping",
+                                            params: { screen: "ShoppingScreen" }
+                                        })}
+                                    />
+                                </View>
+                            ) : (
+                                <MyFlatList
+                                    data={cartItems}
+                                    renderItem={renderItem}
+                                    isLoading={isLoading}
+                                    handleLoading={handleLoading}
+                                    renderPaginationButtons={() => <View style={{ paddingBottom: 400 }}></View>}
+                                />
+                            )}
                         </View>
                     </Dashboard>
 
-                    <View style={styles.bottomWrapper}>
-                        <View style={[ styles.totalContainer, { backgroundColor: colors.surfaceContainerHigh, shadowColor: colors.primaryShadow } ]}>
-                            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                <Text style={styles.text1}>Number of products</Text>
-                                <Text style={[ styles.text1, { color: colors.onSurface } ]}>{numberOfProduct}</Text>
+                    {cartItems.length > 0 && (
+                        <View style={styles.bottomWrapper}>
+                            <View style={[ styles.totalContainer, { backgroundColor: colors.surfaceContainerHigh, shadowColor: colors.primaryShadow } ]}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                                    <Text style={styles.text1}>Number of products</Text>
+                                    <Text style={[ styles.text1, { color: colors.onSurface } ]}>{numberOfProduct}</Text>
+                                </View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
+                                    <Text style={styles.text2}>Total</Text>
+                                    <Text style={[ styles.text2, { color: colors.onSurface } ]}>${totalPrice}</Text>
+                                </View>
+                                <View style={styles.buttonContainer}>
+                                    <ButtonPrimary
+                                        text={"Clear Cart"}
+                                        buttonPrimaryMarginTop={30}
+                                        buttonPrimaryBackgroundColor={Color.colorRed}
+                                        onPressButton={() => setShowConfirmModal(true)}
+                                    />
+                                    <ButtonPrimary
+                                        text={"Pay now"}
+                                        buttonPrimaryMarginTop={30}
+                                        onPressButton={() => navigation.navigate("Payment", { Amount: numberOfProduct, Price: totalPrice })}
+                                    />
+                                </View>
                             </View>
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
-                                <Text style={styles.text2}>Total</Text>
-                                <Text style={[ styles.text2, { color: colors.onSurface } ]}>${totalPrice}</Text>
-                            </View>
-                            <ButtonPrimary
-                                text={"Pay now"}
-                                buttonPrimaryMarginTop={30}
-                                onPressButton={() => navigation.navigate("Payment", { Amount: numberOfProduct, Price: totalPrice })}
-                            />
                         </View>
-                    </View>
+                    )}
                 </>
             )}
+            
+            <ConfirmModal
+                visible={showConfirmModal}
+                onClose={() => setShowConfirmModal(false)}
+                onConfirm={handleClearCart}
+                title="Clear Cart"
+                message="Are you sure you want to remove all items from your cart? This action cannot be undone."
+                confirmText="Clear Cart"
+                cancelText="Cancel"
+                confirmColor="#FF4444"
+            />
+            
+            <SuccessModal
+                visible={showSuccessModal}
+                onClose={() => setShowSuccessModal(false)}
+                title="Cart Cleared"
+                message="All items have been successfully removed from your cart."
+                buttonText="Continue Shopping"
+            />
         </View>
     );
 }
@@ -184,6 +267,21 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.5,
         borderRadius: Border.br_3xs,
         padding: Padding.p_3xs,
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
+    emptyCartContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        paddingHorizontal: 20,
+    },
+    emptyCartText: {
+        fontFamily: FontFamily.typographyLabelLarge,
+        fontSize: FontSize.labelLargeBold_size * 1.5,
+        textAlign: "center",
     },
 });
 

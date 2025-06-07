@@ -101,12 +101,12 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   success: {
-    fontSize: FontSize.headline3Bold_size,
+    fontSize: 30,
     fontWeight: "700",
     fontFamily: FontFamily.labelMediumBold,
   },
   referenceSiteAboutLorem: {
-    fontSize: FontSize.labelLargeBold_size,
+    fontSize: 16,
     fontWeight: "500",
     fontFamily: FontFamily.labelLargeMedium,
     color: Color.primaryPrimaryFixed,

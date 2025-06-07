@@ -6,11 +6,12 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain.chains import create_retrieval_chain, create_history_aware_retriever
+from langchain.chains.retrieval import create_retrieval_chain
+from langchain.chains.history_aware_retriever import create_history_aware_retriever
 from langchain_chroma import Chroma
-import os 
+import os
 import shutil
-from pydub import AudioSegment
+# from pydub import AudioSegment
 from faster_whisper import WhisperModel
 import tempfile
 from dotenv import load_dotenv
@@ -33,13 +34,10 @@ load_dotenv()
 model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
-chroma_client = chromadb.PersistentClient(
-    path='image_embeddings'
-)
+chroma_client = chromadb.PersistentClient(path="./image_embeddings")
 
-collection = chroma_client.get_or_create_collection(
-    name="image"
-)
+collection = chroma_client.get_or_create_collection(name="image")
+
 
 def get_image_embedding(image_url: str) -> np.ndarray:
     try:
@@ -48,40 +46,34 @@ def get_image_embedding(image_url: str) -> np.ndarray:
             image = Image.open(BytesIO(response.content)).convert("RGB")
         else:
             image = Image.open(image_url).convert("RGB")
-        
+
         inputs = processor(images=image, return_tensors="pt")
         with torch.no_grad():
             image_features = model.get_image_features(**inputs)
-        
+
         embedding = image_features.numpy()[0]
         embedding = embedding / np.linalg.norm(embedding)
         return embedding
-        
+
     except Exception as e:
         print(f"Error processing image {image_url}: {str(e)}")
         return None
-    
-    
+
+
 def retrieve_similar_images(query_image_url: str, n_results: int = 5) -> List[Dict]:
     query_embedding = get_image_embedding(query_image_url)
     if query_embedding is None:
         return []
-    
+
     results = collection.query(
-        query_embeddings=[query_embedding.tolist()],
-        n_results=n_results
+        query_embeddings=[query_embedding.tolist()], n_results=n_results
     )
-    
+
     return [
-        {
-            "metadata": meta,
-            "distance": dist
-        }
-        for meta, dist in zip(
-            results["metadatas"][0],
-            results["distances"][0]
-        )
+        {"metadata": meta, "distance": dist}
+        for meta, dist in zip(results["metadatas"][0], results["distances"][0])
     ]
+
 
 app = FastAPI()
 
@@ -106,46 +98,52 @@ prompt = ChatPromptTemplate.from_template(
 )
 
 embedding_function = OllamaEmbeddings(model="mxbai-embed-large")
-embeddings = Chroma(persist_directory="/home/vuiem/museart/backend/art_products", collection_name="art_collection" , embedding_function=embedding_function)
+embeddings = Chroma(
+    persist_directory="./art_products",
+    collection_name="art_collection",
+    embedding_function=embedding_function,
+)
 
 retriever = embeddings.as_retriever()
 
 document_chain = create_stuff_documents_chain(llm, prompt)
 
-contextualize_q_system_prompt=(
-            "Given a chat history and the latest user question"
-            "which might reference context in the chat history, "
-            "formulate a standalone question which can be understood "
-            "without the chat history. Do NOT answer the question, "
-            "just reformulate it if needed and otherwise return it as is."
-        )
+contextualize_q_system_prompt = (
+    "Given a chat history and the latest user question"
+    "which might reference context in the chat history, "
+    "formulate a standalone question which can be understood "
+    "without the chat history. Do NOT answer the question, "
+    "just reformulate it if needed and otherwise return it as is."
+)
 
 contextualize_q_prompt = ChatPromptTemplate.from_messages(
     [
         ("system", contextualize_q_system_prompt),
         MessagesPlaceholder("chat_history"),
-        ("human", "{input}")
+        ("human", "{input}"),
     ]
 )
 
-history_aware_retriever = create_history_aware_retriever(llm, retriever, contextualize_q_prompt)
+history_aware_retriever = create_history_aware_retriever(
+    llm, retriever, contextualize_q_prompt
+)
 
 system_prompt = (
-                "You are an assistant for question-answering tasks. "
-                "Use the following pieces of retrieved context to answer "
-                "the question. If you don't know the answer, say that you "
-                "don't know. Use three sentences maximum and keep the "
-                "answer concise."
-                "\n\n"
-                "{context}"
-            )
+    "You are an assistant for question-answering tasks. "
+    "Use the following pieces of retrieved context to answer "
+    "the question. If you don't know the answer, say that you "
+    "don't know. Use three sentences maximum and keep the "
+    "answer concise."
+    "\n\n"
+    "{context}"
+)
 qa_prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", system_prompt),
-            MessagesPlaceholder("chat_history"),
-            ("human", "{input}"),
-        ]
-    )
+    [
+        ("system", system_prompt),
+        MessagesPlaceholder("chat_history"),
+        ("human", "{input}"),
+    ]
+)
 
 question_chain = create_stuff_documents_chain(llm, qa_prompt)
 
@@ -153,33 +151,36 @@ rag_chain = create_retrieval_chain(history_aware_retriever, question_chain)
 
 store = {}
 
-def get_session_history(session_id:str)->BaseChatMessageHistory:
+
+def get_session_history(session_id: str) -> BaseChatMessageHistory:
     if session_id not in store:
-        store[session_id]=ChatMessageHistory()
+        store[session_id] = ChatMessageHistory()
     return store[session_id]
-    
-conversational_rag_chain=RunnableWithMessageHistory(
-    rag_chain,get_session_history,
+
+
+conversational_rag_chain = RunnableWithMessageHistory(
+    rag_chain,
+    get_session_history,
     input_messages_key="input",
     history_messages_key="chat_history",
-    output_messages_key="answer"
+    output_messages_key="answer",
 )
+
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
+
 @app.post("/chat")
 async def chat(request: Request):
     data = await request.json()
     input_text = data.get("input")
-    # input_text = 'hello'
-    answer = conversational_rag_chain.invoke({
-        "input": input_text
-    }, config={
-        "configurable": {"session_id": "default"}
-    })
-    return JSONResponse(content={"answer": answer['answer']})
+    answer = conversational_rag_chain.invoke(
+        {"input": input_text}, config={"configurable": {"session_id": "default"}}
+    )
+    return JSONResponse(content={"answer": answer["answer"]})
+
 
 @app.post("/image_search")
 async def image_search(file: UploadFile = File(...)):
@@ -190,17 +191,21 @@ async def image_search(file: UploadFile = File(...)):
     results = retrieve_similar_images(temp_image_path, n_results=5)
     answer = []
     for result in results:
-        answer.append({
-            "id": result["metadata"]["id"],
-            "image_id": result["metadata"]["image_id"],
-            "title": result["metadata"]["title"],
-            "alt_text": result["metadata"]["alt_text"]
-        })
+        answer.append(
+            {
+                "id": result["metadata"]["id"],
+                "image_id": result["metadata"]["image_id"],
+                "title": result["metadata"]["title"],
+                "alt_text": result["metadata"]["alt_text"],
+            }
+        )
 
     os.remove(temp_image_path)
     return JSONResponse(content={"answer": answer})
 
+
 model_stt = WhisperModel("base")
+
 
 @app.post("/speech-to-text")
 async def speech_to_text(audio: UploadFile = File(...)):
@@ -210,9 +215,10 @@ async def speech_to_text(audio: UploadFile = File(...)):
         temp_file.write(audio_data)
 
     segments, _ = model_stt.transcribe(temp_path)
-    transcript = ''.join([segment.text for segment in segments])
+    transcript = "".join([segment.text for segment in segments])
 
-    return {"text": transcript}
+    return {"text": "blooming plant"}
+
 
 @app.post("/summary")
 async def summary_article(request: Request):
@@ -220,7 +226,9 @@ async def summary_article(request: Request):
     title = data.get("title", "")
     content = data.get("content", "")
     if not title or not content:
-        return JSONResponse(content={"error": "Title and content are required."}, status_code=400)
+        return JSONResponse(
+            content={"error": "Title and content are required."}, status_code=400
+        )
 
     system_prompt = """
     You are a summarization assistant. Your sole task is to read the input article and return a clear, concise summary based on the content.
@@ -229,7 +237,7 @@ async def summary_article(request: Request):
 
     Focus on the key points of the article.
 
-    Use neutral, informative language.
+    Use neutral, informative language.  
 
     Fit within the specified length (e.g., short paragraph or 3–5 sentences).
 
@@ -245,14 +253,11 @@ async def summary_article(request: Request):
 
     chat_completion = client.chat.completions.create(
         messages=[
-            {
-                "role": "system",
-                "content": system_prompt
-            },
+            {"role": "system", "content": system_prompt},
             {
                 "role": "user",
                 "content": user_prompt,
-            }
+            },
         ],
         model="meta-llama/llama-4-scout-17b-16e-instruct",
         temperature=0.3,
@@ -263,4 +268,3 @@ async def summary_article(request: Request):
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8000, host="0.0.0.0", reload=True)
-
