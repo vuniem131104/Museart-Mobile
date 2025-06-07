@@ -1,6 +1,19 @@
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import React from 'react';
-import { FontSize, FontFamily, Color, Padding } from "../../GlobalStyles";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
+import React from "react";
+import {
+  FontSize,
+  FontFamily,
+  Color,
+  Padding,
+  Border,
+} from "../../GlobalStyles";
 import AboutTitle from "../../components/detail/content/AboutTitle";
 import BoardExtraInfo from "../../components/detail/picture/BoardExtraInfo";
 import NavbarTop from "../../components/header/NavbarTop";
@@ -14,9 +27,10 @@ const ArticleDetail = () => {
   const route = useRoute();
   const { ID } = route.params;
 
-  const [ article, setArticle ] = useState([]);
-  const [ isLoading, setLoading ] = useState(true);
-  const [ summary, setSummary ] = useState("");
+  const [article, setArticle] = useState([]);
+  const [isLoading, setLoading] = useState(true);
+  const [summary, setSummary] = useState("");
+  const [isSummarizing, setSummarizing] = useState(false);
   const { colors } = useTheme();
 
   const getArticle = async () => {
@@ -35,44 +49,83 @@ const ArticleDetail = () => {
   }, []);
 
   const handleSummary = async () => {
+    setSummarizing(true);
+    setSummary("");
     try {
-      console.log("Summarizing...");
       const response = await axios.post(`${API_URL}/summary`, {
         title: article.title,
-        content: article.copy
+        content: article.copy,
       });
       setSummary(response.data.summary);
     } catch (error) {
       console.error("Summary failed:", error);
       Alert.alert("Error", "Could not summarize the article.");
+    } finally {
+      setSummarizing(false);
     }
   };
 
   return (
-    <View className={`w-screen flex-1`} style={[ { backgroundColor: colors.surfaceContainer } ]}>
+    <View
+      className={`w-screen flex-1`}
+      style={[{ backgroundColor: colors.surfaceContainer }]}
+    >
       <NavbarTop />
       {isLoading ? (
         <ActivityIndicator />
       ) : (
         <ScrollView style={styles.body}>
-          <AboutTitle title={article.title} tagRoute="Article" tagDetail="Document" isPrice={false} />
+          <AboutTitle
+            title={article.title}
+            tagRoute="Article"
+            tagDetail="Document"
+            isPrice={false}
+          />
           <View style={{ height: 15 }} />
-          <BoardExtraInfo commentAmount={""} likeAmount={''} date={article.timestamp} />
+          <BoardExtraInfo
+            commentAmount={""}
+            likeAmount={""}
+            date={article.timestamp}
+          />
 
-          <Text style={[ styles.thereAreMany, styles.thereAreManySpaceBlock, { color: colors.onSurface } ]}>{article.copy.trim()}</Text>
-          <ButtonPrimary text="Summarize"
+          <Text
+            style={[
+              styles.thereAreMany,
+              styles.thereAreManySpaceBlock,
+              { color: colors.onSurface },
+            ]}
+          >
+            {article.copy.trim()}
+          </Text>
+          <ButtonPrimary
+            text="Summarize"
             textSize={16}
             textMargin={8}
             buttonPrimaryFlex={1}
             onPressButton={handleSummary}
+            buttonPrimaryMarginTop={30}
           />
 
-          {summary && (
-            <View style={{ marginTop: 10, paddingBottom: 70 }}>
-              <Text style={[ styles.summaryText, { color: colors.onSurface } ]}>
-                {summary}
-              </Text>
-            </View>
+          {isSummarizing ? (
+            <ActivityIndicator style={{ marginTop: 20 }} size="large" />
+          ) : (
+            summary && (
+              <View
+                style={[
+                  styles.summaryContainer,
+                  { backgroundColor: colors.surfaceContainerLow },
+                ]}
+              >
+                <Text
+                  style={[styles.summaryTitle, { color: colors.onSurface }]}
+                >
+                  Summary
+                </Text>
+                <Text style={[styles.summaryText, { color: colors.onSurface }]}>
+                  {summary}
+                </Text>
+              </View>
+            )
           )}
         </ScrollView>
       )}
@@ -107,13 +160,23 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.typographyLabelLarge,
     color: Color.surfaceOnSurface,
     textAlign: "justify",
-    marginBottom: -60,
+  },
+  summaryContainer: {
+    marginTop: 20,
+    borderRadius: Border.br_3xs,
+    padding: Padding.p_mini,
+    marginBottom: 50,
+  },
+  summaryTitle: {
+    fontSize: FontSize.titleMediumBold_size,
+    fontFamily: FontFamily.labelMediumBold,
+    marginBottom: Padding.p_3xs,
   },
   summaryText: {
     fontSize: FontSize.labelLargeBold_size,
     fontFamily: FontFamily.typographyLabelLarge,
     textAlign: "justify",
-    marginBottom: -60,
+    lineHeight: 22,
   },
 });
 

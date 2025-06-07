@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Modal,
   View,
@@ -8,19 +8,19 @@ import {
   Dimensions,
   Animated,
   TouchableWithoutFeedback,
-} from 'react-native';
-import { useTheme } from '@react-navigation/native';
-import { FontFamily, FontSize, Border, Padding } from '../../GlobalStyles';
-import { Image } from 'expo-image';
+} from "react-native";
+import { useTheme } from "@react-navigation/native";
+import { FontFamily, FontSize, Border, Padding } from "../../GlobalStyles";
+import { Image } from "expo-image";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const SuccessModal = ({
   visible,
   onClose,
-  title = 'Success',
+  title = "Success",
   message,
-  buttonText = 'OK',
+  buttonText = "OK",
 }) => {
   const { colors } = useTheme();
   const scaleValue = React.useRef(new Animated.Value(0)).current;
@@ -85,26 +85,29 @@ const SuccessModal = ({
               ]}
             >
               <View style={styles.modalContent}>
-                <View style={[styles.iconContainer, { backgroundColor: '#4CAF50' }]}>
+                <View
+                  style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}
+                >
                   <Text style={styles.checkIcon}>✓</Text>
                 </View>
-                
+
                 <Text style={[styles.title, { color: colors.onSurface }]}>
                   {title}
                 </Text>
-                
-                <Text style={[styles.message, { color: colors.onSurfaceVariant }]}>
+
+                <Text
+                  style={[styles.message, { color: colors.onSurfaceVarient }]}
+                >
                   {message}
                 </Text>
-                
+
                 <TouchableOpacity
-                  style={[
-                    styles.button,
-                    { backgroundColor: colors.primary }
-                  ]}
+                  style={[styles.button, { backgroundColor: colors.primary }]}
                   onPress={onClose}
                 >
-                  <Text style={[styles.buttonText, { color: colors.onPrimary }]}>
+                  <Text
+                    style={[styles.buttonText, { color: colors.onPrimary }]}
+                  >
                     {buttonText}
                   </Text>
                 </TouchableOpacity>
@@ -120,9 +123,9 @@ const SuccessModal = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContainer: {
     width: width * 0.85,
@@ -138,32 +141,32 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     padding: Padding.p_xl,
-    alignItems: 'center',
+    alignItems: "center",
   },
   iconContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 16,
   },
   checkIcon: {
     fontSize: 30,
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    color: "#FFFFFF",
+    fontWeight: "bold",
   },
   title: {
     fontSize: FontSize.headlineSmall_size,
     fontFamily: FontFamily.labelMediumBold,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
     marginBottom: 12,
   },
   message: {
     fontSize: FontSize.bodyMedium_size,
     fontFamily: FontFamily.typographyLabelLarge,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 20,
     marginBottom: 24,
   },
@@ -171,14 +174,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     minWidth: 100,
   },
   buttonText: {
     fontSize: FontSize.labelLarge_size,
     fontFamily: FontFamily.labelMediumBold,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });
 

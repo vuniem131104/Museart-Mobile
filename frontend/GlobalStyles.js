@@ -84,16 +84,16 @@ export const MyLightTheme = {
   },
   fonts: {
     regular: {
-      fontFamily: FontFamily.typographyLabelLarge
+      fontFamily: FontFamily.typographyLabelLarge,
     },
     medium: {
-      fontFamily: FontFamily.labelLargeMedium
+      fontFamily: FontFamily.labelLargeMedium,
     },
     bold: {
-      fontFamily: FontFamily.labelMediumBold
-    }
-  }
-}
+      fontFamily: FontFamily.labelMediumBold,
+    },
+  },
+};
 
 export const MyDarkTheme = {
   colors: {
@@ -105,7 +105,7 @@ export const MyDarkTheme = {
     surfaceContainerLowest: "#0B0B0B",
     surfaceContainerHigh: "#101010",
     surfaceContainerHighest: "#1C1B19",
-    onSurfaceVarient: "#827775",
+    onSurfaceVarient: "#F5F2EC",
     // onSurface:"#F5F2EC",
     primary: "#D00000",
     primaryShadow: "#444444",
@@ -113,13 +113,13 @@ export const MyDarkTheme = {
   },
   fonts: {
     regular: {
-      fontFamily: FontFamily.typographyLabelLarge
+      fontFamily: FontFamily.typographyLabelLarge,
     },
     medium: {
-      fontFamily: FontFamily.labelLargeMedium
+      fontFamily: FontFamily.labelLargeMedium,
     },
     bold: {
-      fontFamily: FontFamily.labelMediumBold
-    }
-  }
-}
+      fontFamily: FontFamily.labelMediumBold,
+    },
+  },
+};
